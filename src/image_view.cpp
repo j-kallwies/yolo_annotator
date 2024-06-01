@@ -8,7 +8,6 @@ ImageView::ImageView(QWidget* parent)
     : QGraphicsView(parent)
 {
   viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
-  // setDragMode(ScrollHandDrag);
 
   setMouseTracking(true);
 }
@@ -202,7 +201,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
 
   const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
 
-  if (event->button() == Qt::LeftButton)
+  if (event->button() == Qt::LeftButton && this->dragMode() != QGraphicsView::DragMode::ScrollHandDrag)
   {
     if (bbox_edit_mode_ == BoundingBoxEditMode::None)
     {
@@ -286,12 +285,22 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     }
   }
 
-  else if (event->button() == Qt::MiddleButton)
+  else if (event->button() == Qt::MiddleButton || event->button() == Qt::RightButton)
   {
     setCursor(Qt::DragMoveCursor);
-    lastCursorPosition = event->pos();
-    event->accept();
+
+    // temporarly enable dragging mode
+    this->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    // emit a left mouse click (the default button for the drag mode)
+    QMouseEvent* fake_press_event = new QMouseEvent(QEvent::GraphicsSceneMousePress,
+                                                    event->position(),
+                                                    event->globalPosition(),
+                                                    Qt::MouseButton::LeftButton,
+                                                    Qt::MouseButton::LeftButton,
+                                                    Qt::KeyboardModifier::NoModifier);
+    this->mousePressEvent(fake_press_event);
   }
+
   QGraphicsView::mousePressEvent(event);
 }
 
@@ -382,27 +391,14 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     break;
   }
 
-  if (event->buttons() == Qt::MiddleButton)
-  {
-    setTransformationAnchor(AnchorUnderMouse);
-
-    const auto movement = lastCursorPosition - event->pos();
-    translate(movement.x() / transform().m11(), movement.y() / transform().m11());
-
-    qDebug() << lastCursorPosition << " -> " << event->pos() << ": movement=" << movement;
-
-    event->accept();
-
-    lastCursorPosition = event->pos();
-  }
-  else
-  {
-    QGraphicsView::mouseMoveEvent(event);
-  }
+  QGraphicsView::mouseMoveEvent(event);
 }
 
 void ImageView::mouseReleaseEvent(QMouseEvent* event)
 {
+  // disable drag mode if dragging is finished
+  this->setDragMode(QGraphicsView::DragMode::NoDrag);
+
   // unsetCursor();
   QGraphicsView::mouseReleaseEvent(event);
 }
