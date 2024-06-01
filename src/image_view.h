@@ -41,7 +41,6 @@ private:
   QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes_{nullptr};
   AnnotationBoundingBox** selected_bbox_{nullptr};
 
-  QPoint lastCursorPosition;
   qreal totalScaleFactor = 1;
   QPointF total_movement_{0, 0};
   TouchMode touch_mode_{TouchMode::None};
