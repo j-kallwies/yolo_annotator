@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QScopedPointer>
 #include <QGraphicsScene>
+#include <QSettings>
 
 #include "annotationboundingbox.h"
 
@@ -21,7 +22,11 @@ public:
 private:
   QScopedPointer<Ui::MainWindow> ui;
 
+  QSettings settings_{"YOLO", "Annotator"};
+
   QGraphicsScene* scene_{new QGraphicsScene(this)};
   QVector<std::shared_ptr<AnnotationBoundingBox>> annotation_bounding_boxes_;
   AnnotationBoundingBox* selected_bbox_{nullptr};
+
+  void closeEvent(QCloseEvent* event) override;
 };

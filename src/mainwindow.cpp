@@ -19,6 +19,20 @@ MainWindow::MainWindow(QWidget* parent)
 
   ui->image_view->setImage(
       QImage("/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/IMG_0916.jpeg"));
+
+  // Restore the previous state
+  this->restoreGeometry(settings_.value("window/geometry").toByteArray());
+  this->restoreState(settings_.value("window/state").toByteArray());
+  ui->splitter->restoreState(settings_.value("splitter/state").toByteArray());
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+  settings_.setValue("window/geometry", saveGeometry());
+  settings_.setValue("window/state", saveState());
+  settings_.setValue("splitter/state", ui->splitter->saveState());
+
+  QMainWindow::closeEvent(event);
 }
 
 MainWindow::~MainWindow()

@@ -145,15 +145,15 @@ bool ImageView::viewportEvent(QEvent* event)
     qDebug() << "QEvent::Wheel";
     return QGraphicsView::viewportEvent(event);
 
-    // // Disable wheel events
-    // if (touch_mode_ != TouchMode::Moving)
-    // {
-    //   return true;
-    // }
-    // else
-    // {
-    //   return false;
-    // }
+    // Disable wheel events
+    if (touch_mode_ != TouchMode::Moving)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
     // case QEvent::MouseButtonPress:
