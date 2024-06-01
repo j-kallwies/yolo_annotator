@@ -251,7 +251,6 @@ void ImageView::mousePressEvent(QMouseEvent* event)
           // Unselect previous BBox
           if (*selected_bbox_id_)
           {
-            qDebug() << "Unselect " << (*selected_bbox_id_).value();
             (*annotation_bounding_boxes_)[(*selected_bbox_id_).value()]->unselect();
           }
 
