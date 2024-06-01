@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
   ui->setupUi(this);
 
-  ui->image_view->init(&annotation_bounding_boxes_, &selected_bbox_);
+  ui->image_view->init(&annotation_bounding_boxes_, &selected_bbox_id_);
 
   ui->image_view->setScene(scene_);
   ui->image_view->setInteractive(true);

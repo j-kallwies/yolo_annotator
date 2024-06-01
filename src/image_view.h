@@ -28,7 +28,7 @@ class ImageView : public QGraphicsView
 public:
   ImageView(QWidget* parent = nullptr);
 
-  void init(QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes, AnnotationBoundingBox** selected_bbox);
+  void init(QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes, std::optional<int>* selected_bbox_id);
 
   void setImage(const QImage& image);
 
@@ -36,10 +36,11 @@ public:
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
 private:
-  QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes_{nullptr};
-  AnnotationBoundingBox** selected_bbox_{nullptr};
+  QList<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes_{nullptr};
+  std::optional<int>* selected_bbox_id_{nullptr};
 
   qreal totalScaleFactor = 1;
   QPointF total_movement_{0, 0};
@@ -51,10 +52,10 @@ private:
   QGraphicsLineItem* h_line_item_;
 
   BoundingBoxEditMode bbox_edit_mode_{BoundingBoxEditMode::None};
-  AnnotationBoundingBox* edit_bbox_{nullptr};
+  std::optional<int> edit_bbox_id_;
   BoundingBoxPart edit_bbox_part_;
   QPointF edit_bbox_static_opposite_point_;
   QPointF edit_bbox_offset_;
 
-  std::optional<std::pair<AnnotationBoundingBox*, BoundingBoxPart>> getBoundingBoxPartUnderCursor(const QPointF& cursor_position);
+  std::optional<std::pair<int, BoundingBoxPart>> getBoundingBoxPartUnderCursor(const QPointF& cursor_position);
 };

@@ -27,7 +27,7 @@ private:
 
   QGraphicsScene* scene_{new QGraphicsScene(this)};
   QVector<std::shared_ptr<AnnotationBoundingBox>> annotation_bounding_boxes_;
-  AnnotationBoundingBox* selected_bbox_{nullptr};
+  std::optional<int> selected_bbox_id_;
 
   void closeEvent(QCloseEvent* event) override;
 };

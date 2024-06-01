@@ -13,10 +13,10 @@ ImageView::ImageView(QWidget* parent)
 }
 
 void ImageView::init(QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes,
-                     AnnotationBoundingBox** selected_bbox)
+                     std::optional<int>* selected_bbox_id)
 {
   annotation_bounding_boxes_ = annotation_bounding_boxes;
-  selected_bbox_ = selected_bbox;
+  selected_bbox_id_ = selected_bbox_id;
 }
 
 void ImageView::setImage(const QImage& image)
@@ -47,17 +47,19 @@ void ImageView::setImage(const QImage& image)
   }
 }
 
-std::optional<std::pair<AnnotationBoundingBox*, BoundingBoxPart>>
-ImageView::getBoundingBoxPartUnderCursor(const QPointF& cursor_position)
+std::optional<std::pair<int, BoundingBoxPart>> ImageView::getBoundingBoxPartUnderCursor(const QPointF& cursor_position)
 {
+  int bbox_id = 0;
   for (std::shared_ptr<AnnotationBoundingBox>& bbox : *annotation_bounding_boxes_)
   {
     std::optional<BoundingBoxPart> part = bbox->getPart(cursor_position);
 
     if (part)
     {
-      return std::make_pair(bbox.get(), *part);
+      return std::make_pair(bbox_id, *part);
     }
+
+    bbox_id++;
   }
 
   // Fallback
@@ -210,11 +212,12 @@ void ImageView::mousePressEvent(QMouseEvent* event)
       // Case A: No bounding box under the cursor => Start new BBox!
       if (!bbox_part_under_cursor)
       {
-        if (*selected_bbox_)
+        if (*selected_bbox_id_)
         {
-          (*selected_bbox_)->unselect();
-          *selected_bbox_ = nullptr;
-        }
+          int bbox_id = *(*selected_bbox_id_);
+          annotation_bounding_boxes_->at(bbox_id)->unselect();
+          *selected_bbox_id_ = {};
+        };
 
         bbox_edit_mode_ = BoundingBoxEditMode::New;
 
@@ -229,24 +232,27 @@ void ImageView::mousePressEvent(QMouseEvent* event)
       // Case B: We found a bounding box under the cursor => Start editing / dragging!
       else
       {
-        edit_bbox_ = bbox_part_under_cursor->first;
+        edit_bbox_id_ = bbox_part_under_cursor->first;
         edit_bbox_part_ = bbox_part_under_cursor->second;
+
+        AnnotationBoundingBox& edit_bbox = *((*annotation_bounding_boxes_)[*edit_bbox_id_]);
 
         switch (bbox_part_under_cursor->second)
         {
         case BoundingBoxPart::CentralArea:
           bbox_edit_mode_ = BoundingBoxEditMode::DragFullBox;
-          edit_bbox_offset_ = cursor_position - edit_bbox_->rect().center();
+          edit_bbox_offset_ = cursor_position - edit_bbox.rect().center();
 
           // Unselect previous BBox
-          if (*selected_bbox_)
+          if (*selected_bbox_id_)
           {
-            (*selected_bbox_)->unselect();
+            qDebug() << "Unselect " << (*selected_bbox_id_).value();
+            (*annotation_bounding_boxes_)[(*selected_bbox_id_).value()]->unselect();
           }
 
           // Select new BBox
-          *selected_bbox_ = edit_bbox_;
-          (*selected_bbox_)->select();
+          *selected_bbox_id_ = edit_bbox_id_;
+          (*annotation_bounding_boxes_)[*edit_bbox_id_]->select();
           break;
 
         case BoundingBoxPart::CornerLowerLeft:
@@ -257,19 +263,19 @@ void ImageView::mousePressEvent(QMouseEvent* event)
           switch (edit_bbox_part_)
           {
           case BoundingBoxPart::CornerUpperLeft:
-            edit_bbox_static_opposite_point_ = edit_bbox_->rect().bottomRight();
+            edit_bbox_static_opposite_point_ = edit_bbox.rect().bottomRight();
             break;
 
           case BoundingBoxPart::CornerUpperRight:
-            edit_bbox_static_opposite_point_ = edit_bbox_->rect().bottomLeft();
+            edit_bbox_static_opposite_point_ = edit_bbox.rect().bottomLeft();
             break;
 
           case BoundingBoxPart::CornerLowerRight:
-            edit_bbox_static_opposite_point_ = edit_bbox_->rect().topLeft();
+            edit_bbox_static_opposite_point_ = edit_bbox.rect().topLeft();
             break;
 
           case BoundingBoxPart::CornerLowerLeft:
-            edit_bbox_static_opposite_point_ = edit_bbox_->rect().topRight();
+            edit_bbox_static_opposite_point_ = edit_bbox.rect().topRight();
             break;
           }
           break;
@@ -350,6 +356,8 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
   v_line_item_->setPos(cursor_position.x(), 0);
   h_line_item_->setPos(0, cursor_position.y());
 
+  AnnotationBoundingBox& edit_bbox = *((*annotation_bounding_boxes_)[*edit_bbox_id_]);
+
   switch (bbox_edit_mode_)
   {
   case BoundingBoxEditMode::New:
@@ -362,7 +370,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     break;
 
   case BoundingBoxEditMode::DragFullBox:
-    edit_bbox_->setCenter(cursor_position - edit_bbox_offset_);
+    edit_bbox.setCenter(cursor_position - edit_bbox_offset_);
     this->setCursor(QCursor(Qt::SizeAllCursor));
     break;
 
@@ -370,25 +378,25 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     switch (edit_bbox_part_)
     {
     case BoundingBoxPart::EdgeLeft:
-      edit_bbox_->setXMin(cursor_position.x());
+      edit_bbox.setXMin(cursor_position.x());
       break;
 
     case BoundingBoxPart::EdgeRight:
-      edit_bbox_->setXMax(cursor_position.x());
+      edit_bbox.setXMax(cursor_position.x());
       break;
 
     case BoundingBoxPart::EdgeTop:
-      edit_bbox_->setYMin(cursor_position.y());
+      edit_bbox.setYMin(cursor_position.y());
       break;
 
     case BoundingBoxPart::EdgeBottom:
-      edit_bbox_->setYMax(cursor_position.y());
+      edit_bbox.setYMax(cursor_position.y());
       break;
     }
     break;
 
   case BoundingBoxEditMode::DragCorner:
-    edit_bbox_->setCornerPoints(edit_bbox_static_opposite_point_, cursor_position);
+    edit_bbox.setCornerPoints(edit_bbox_static_opposite_point_, cursor_position);
     break;
   }
 
@@ -402,4 +410,17 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
 
   // unsetCursor();
   QGraphicsView::mouseReleaseEvent(event);
+}
+
+void ImageView::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Backspace)
+  {
+    if (*selected_bbox_id_)
+    {
+      scene()->removeItem(annotation_bounding_boxes_->at((*selected_bbox_id_).value()).get());
+      annotation_bounding_boxes_->remove((*selected_bbox_id_).value());
+      *selected_bbox_id_ = {};
+    }
+  }
 }
