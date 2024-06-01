@@ -181,9 +181,14 @@ bool ImageView::viewportEvent(QEvent* event)
 
   case QEvent::MouseButtonRelease:
   {
-    // if (bbox_edit_mode_ == BoundingBoxEditMode::New)
-    // {
-    // }
+    if (bbox_edit_mode_ == BoundingBoxEditMode::New)
+    {
+      if (annotation_bounding_boxes_->back()->rect().width() <= 1 || annotation_bounding_boxes_->back()->rect().height() <= 1)
+      {
+        scene()->removeItem(annotation_bounding_boxes_->back().get());
+        annotation_bounding_boxes_->pop_back();
+      }
+    }
 
     // End editing
     bbox_edit_mode_ = BoundingBoxEditMode::None;
