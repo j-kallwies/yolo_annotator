@@ -363,6 +363,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
 
   case BoundingBoxEditMode::DragFullBox:
     edit_bbox_->setCenter(cursor_position - edit_bbox_offset_);
+    this->setCursor(QCursor(Qt::SizeAllCursor));
     break;
 
   case BoundingBoxEditMode::DragEdge:
