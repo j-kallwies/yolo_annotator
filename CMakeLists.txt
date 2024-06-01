@@ -28,6 +28,12 @@ set(SOURCE_FILES
     src/annotationboundingbox.cpp
 )
 
+set(HEADER_FILES
+    src/mainwindow.h
+    src/image_view.h
+    src/annotationboundingbox.h
+)
+
 add_project_meta(META_FILES_TO_INCLUDE)
 
 set(RESOURCE_FILES example.qrc)
@@ -38,6 +44,7 @@ qt_standard_project_setup()
 
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${SOURCE_FILES}
+    ${HEADER_FILES}
     ${META_FILES_TO_INCLUDE}
     ${RESOURCE_FILES}
 )
