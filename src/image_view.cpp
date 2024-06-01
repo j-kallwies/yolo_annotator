@@ -91,12 +91,12 @@ bool ImageView::viewportEvent(QEvent* event)
       auto zoom_movement = QLineF(touchPoint0.position(), touchPoint1.position()).length() -
                            QLineF(touchPoint0.pressPosition(), touchPoint1.pressPosition()).length();
 
-      qDebug() << "movement_p0=" << movement_p0;
-      qDebug() << "movement_p1=" << movement_p1;
-      qDebug() << "pan_movement=" << mean_movement.manhattanLength();
-      qDebug() << "zoom_movement=" << zoom_movement;
-      qDebug() << "totalScaleFactor=" << totalScaleFactor;
-      qDebug() << "currentScaleFactor=" << currentScaleFactor;
+      // qDebug() << "movement_p0=" << movement_p0;
+      // qDebug() << "movement_p1=" << movement_p1;
+      // qDebug() << "pan_movement=" << mean_movement.manhattanLength();
+      // qDebug() << "zoom_movement=" << zoom_movement;
+      // qDebug() << "totalScaleFactor=" << totalScaleFactor;
+      // qDebug() << "currentScaleFactor=" << currentScaleFactor;
 
       // Start new touch action
       if (touch_mode_ == TouchMode::None)
@@ -112,7 +112,7 @@ bool ImageView::viewportEvent(QEvent* event)
         }
       }
 
-      qDebug() << "touch_mode_=" << int(touch_mode_);
+      // qDebug() << "touch_mode_=" << int(touch_mode_);
 
       if (touch_mode_ != TouchMode::Zooming)
       {
@@ -121,7 +121,7 @@ bool ImageView::viewportEvent(QEvent* event)
 
       if (touchEvent->touchPointStates() & Qt::TouchPointReleased)
       {
-        qDebug() << "TouchPointReleased!";
+        // qDebug() << "TouchPointReleased!";
 
         // if one of the fingers is released, remember the current scale
         // factor so that adding another finger later will continue zooming
@@ -135,14 +135,14 @@ bool ImageView::viewportEvent(QEvent* event)
       setTransform(QTransform::fromScale(totalScaleFactor * currentScaleFactor, totalScaleFactor * currentScaleFactor));
 
       // Update
-      qDebug() << "Current scale: " << transform().m11();
+      // qDebug() << "Current scale: " << transform().m11();
     }
     return true;
   }
 
   case QEvent::Wheel:
   {
-    qDebug() << "QEvent::Wheel";
+    // qDebug() << "QEvent::Wheel";
     return QGraphicsView::viewportEvent(event);
 
     // Disable wheel events
@@ -197,7 +197,7 @@ bool ImageView::viewportEvent(QEvent* event)
 
 void ImageView::mousePressEvent(QMouseEvent* event)
 {
-  qDebug() << "QEvent::mousePressEvent";
+  // qDebug() << "QEvent::mousePressEvent";
 
   const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
 
@@ -306,8 +306,8 @@ void ImageView::mousePressEvent(QMouseEvent* event)
 
 void ImageView::mouseMoveEvent(QMouseEvent* event)
 {
-  qDebug() << "mouseMoveEvent()";
-  qDebug() << "bbox_edit_mode_=" << int(bbox_edit_mode_);
+  // qDebug() << "mouseMoveEvent()";
+  // qDebug() << "bbox_edit_mode_=" << int(bbox_edit_mode_);
 
   const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
 
