@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QGraphicsRectItem>
 #include <QBrush>
+#include <QGraphicsRectItem>
 
 enum class BoundingBoxPart
 {

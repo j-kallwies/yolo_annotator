@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QGraphicsView>
 #include <QEvent>
+#include <QGraphicsView>
 
 #include "annotationboundingbox.h"
 
@@ -26,13 +26,13 @@ class ImageView : public QGraphicsView
   Q_OBJECT
 
 public:
-  ImageView(QWidget *parent = nullptr);
+  ImageView(QWidget* parent = nullptr);
 
   void init(QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes, AnnotationBoundingBox** selected_bbox);
 
   void setImage(const QImage& image);
 
-  bool viewportEvent(QEvent *event) override;
+  bool viewportEvent(QEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
@@ -56,5 +56,5 @@ private:
   QPointF edit_bbox_static_opposite_point_;
   QPointF edit_bbox_offset_;
 
-  std::optional<std::pair<AnnotationBoundingBox*, BoundingBoxPart>> getBoundingBoxPartUnderCursor(const QPointF &cursor_position);
+  std::optional<std::pair<AnnotationBoundingBox*, BoundingBoxPart>> getBoundingBoxPartUnderCursor(const QPointF& cursor_position);
 };

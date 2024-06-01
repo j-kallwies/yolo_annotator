@@ -1,22 +1,23 @@
 #pragma once
 
+#include <QGraphicsScene>
 #include <QMainWindow>
 #include <QScopedPointer>
-#include <QGraphicsScene>
 #include <QSettings>
 
 #include "annotationboundingbox.h"
 
 namespace Ui
 {
-    class MainWindow;
+class MainWindow;
 }
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
   Q_OBJECT
 
 public:
-  MainWindow(QWidget *parent = 0);
+  MainWindow(QWidget* parent = 0);
   virtual ~MainWindow();
 
 private:
