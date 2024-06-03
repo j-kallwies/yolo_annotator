@@ -1,19 +1,13 @@
 #include "annotationboundingbox.h"
+#include "label_colors.h"
 
 #include <QPen>
 
 AnnotationBoundingBox::AnnotationBoundingBox()
 {
-  QPen pen;
-  pen.setWidth(5);
-  pen.setCosmetic(true);
-  pen.setColor(QColor(Qt::red));
-  this->setPen(pen);
-  this->setZValue(100);
+  updateColors();
 
-  default_brush_.setStyle(Qt::NoBrush);
-  selected_brush_.setStyle(Qt::SolidPattern);
-  selected_brush_.setColor(QColor(255, 0, 0, 128));
+  this->setZValue(100);
 }
 
 void AnnotationBoundingBox::setCenter(const QPointF& center)
@@ -177,4 +171,36 @@ void AnnotationBoundingBox::unselect()
   selected_ = false;
 
   this->setBrush(default_brush_);
+}
+
+void AnnotationBoundingBox::setLabelID(int new_label_id)
+{
+  label_id_ = new_label_id;
+  updateColors();
+}
+
+void AnnotationBoundingBox::updateColors()
+{
+  QPen pen;
+  pen.setWidth(5);
+  pen.setCosmetic(true);
+
+  QColor color = LabelColors::colorForLabelId(label_id_);
+
+  pen.setColor(color);
+  this->setPen(pen);
+
+  default_brush_.setStyle(Qt::NoBrush);
+  selected_brush_.setStyle(Qt::SolidPattern);
+  color.setAlpha(100);
+  selected_brush_.setColor(color);
+
+  if (selected_)
+  {
+    this->setBrush(selected_brush_);
+  }
+  else
+  {
+    this->setBrush(default_brush_);
+  }
 }

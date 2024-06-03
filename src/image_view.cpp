@@ -418,13 +418,34 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageView::keyPressEvent(QKeyEvent* event)
 {
-  if (event->key() == Qt::Key_Backspace)
+
+  if (*selected_bbox_id_)
   {
-    if (*selected_bbox_id_)
+    std::shared_ptr<AnnotationBoundingBox> selected_bbox = annotation_bounding_boxes_->at((*selected_bbox_id_).value());
+
+    switch (event->key())
     {
-      scene()->removeItem(annotation_bounding_boxes_->at((*selected_bbox_id_).value()).get());
+    case Qt::Key_Backspace:
+      scene()->removeItem(selected_bbox.get());
       annotation_bounding_boxes_->remove((*selected_bbox_id_).value());
       *selected_bbox_id_ = {};
+      break;
+
+    case Qt::Key_1:
+      selected_bbox->setLabelID(0);
+      break;
+
+    case Qt::Key_2:
+      selected_bbox->setLabelID(1);
+      break;
+
+    case Qt::Key_3:
+      selected_bbox->setLabelID(2);
+      break;
+
+    case Qt::Key_4:
+      selected_bbox->setLabelID(3);
+      break;
     }
   }
 }

@@ -37,9 +37,13 @@ public:
 
   void select();
   void unselect();
+  void setLabelID(int new_label_id);
 
 private:
   bool selected_{false};
   QBrush default_brush_;
   QBrush selected_brush_;
+  int label_id_{1};
+
+  void updateColors();
 };

@@ -26,12 +26,14 @@ set(SOURCE_FILES
     src/mainwindow.cpp
     src/image_view.cpp
     src/annotationboundingbox.cpp
+    src/label_colors.cpp
 )
 
 set(HEADER_FILES
     src/mainwindow.h
     src/image_view.h
     src/annotationboundingbox.h
+    src/label_colors.h
 )
 
 add_project_meta(META_FILES_TO_INCLUDE)
