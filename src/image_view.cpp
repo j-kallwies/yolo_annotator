@@ -45,6 +45,8 @@ void ImageView::setImage(const QImage& image)
     h_line_item_->setLine(QLineF(QPointF(0, 0), QPointF(image.width(), 0)));
     scene()->addItem(h_line_item_);
   }
+
+  scene()->setSceneRect(image_item_->boundingRect());
 }
 
 std::optional<std::pair<int, BoundingBoxPart>> ImageView::getBoundingBoxPartUnderCursor(const QPointF& cursor_position)
