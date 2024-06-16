@@ -226,7 +226,9 @@ void ImageView::mousePressEvent(QMouseEvent* event)
 
         bbox_edit_mode_ = BoundingBoxEditMode::New;
 
-        annotation_bounding_boxes_->push_back(std::shared_ptr<AnnotationBoundingBox>(new AnnotationBoundingBox()));
+        annotation_bounding_boxes_->push_back(
+            std::shared_ptr<AnnotationBoundingBox>(new AnnotationBoundingBox(QSize(image_item_->pixmap().size()))));
+        annotation_bounding_boxes_->back()->setLabelID(active_label_);
         annotation_bounding_boxes_->back()->setRect(QRectF(cursor_position, QSizeF(0, 0)));
 
         current_start_point_ = cursor_position;
@@ -418,34 +420,42 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageView::keyPressEvent(QKeyEvent* event)
 {
+  bool remove_bbox = false;
+
+  switch (event->key())
+  {
+  case Qt::Key_Backspace:
+    remove_bbox = true;
+    break;
+
+  case Qt::Key_1:
+    active_label_ = 0;
+    break;
+
+  case Qt::Key_2:
+    active_label_ = 1;
+    break;
+
+  case Qt::Key_3:
+    active_label_ = 2;
+    break;
+
+  case Qt::Key_4:
+    active_label_ = 3;
+    break;
+  }
 
   if (*selected_bbox_id_)
   {
     std::shared_ptr<AnnotationBoundingBox> selected_bbox = annotation_bounding_boxes_->at((*selected_bbox_id_).value());
 
-    switch (event->key())
+    if (remove_bbox)
     {
-    case Qt::Key_Backspace:
       scene()->removeItem(selected_bbox.get());
       annotation_bounding_boxes_->remove((*selected_bbox_id_).value());
       *selected_bbox_id_ = {};
-      break;
-
-    case Qt::Key_1:
-      selected_bbox->setLabelID(0);
-      break;
-
-    case Qt::Key_2:
-      selected_bbox->setLabelID(1);
-      break;
-
-    case Qt::Key_3:
-      selected_bbox->setLabelID(2);
-      break;
-
-    case Qt::Key_4:
-      selected_bbox->setLabelID(3);
-      break;
     }
+
+    selected_bbox->setLabelID(active_label_);
   }
 }

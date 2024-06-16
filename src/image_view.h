@@ -38,6 +38,8 @@ public:
   void mouseReleaseEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
 
+  int active_label_{0};
+
 private:
   QList<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes_{nullptr};
   std::optional<int>* selected_bbox_id_{nullptr};

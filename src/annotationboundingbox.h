@@ -19,7 +19,7 @@ enum class BoundingBoxPart
 class AnnotationBoundingBox : public QGraphicsRectItem
 {
 public:
-  AnnotationBoundingBox();
+  AnnotationBoundingBox(const QSize& image_size);
 
   void setCenter(const QPointF& center);
   void setCornerPoints(const QPointF& p1, const QPointF& p2);
@@ -43,7 +43,9 @@ private:
   bool selected_{false};
   QBrush default_brush_;
   QBrush selected_brush_;
-  int label_id_{1};
+  int label_id_{0};
+
+  const QSize image_size_;
 
   void updateColors();
 };

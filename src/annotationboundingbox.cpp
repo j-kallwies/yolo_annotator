@@ -3,7 +3,8 @@
 
 #include <QPen>
 
-AnnotationBoundingBox::AnnotationBoundingBox()
+AnnotationBoundingBox::AnnotationBoundingBox(const QSize& image_size)
+    : image_size_(image_size)
 {
   updateColors();
 
