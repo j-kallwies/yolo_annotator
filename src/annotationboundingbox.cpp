@@ -11,6 +11,21 @@ AnnotationBoundingBox::AnnotationBoundingBox(const QSize& image_size)
   this->setZValue(100);
 }
 
+QPointF AnnotationBoundingBox::center() const
+{
+  return rect().center();
+}
+
+float AnnotationBoundingBox::width() const
+{
+  return rect().width();
+}
+
+float AnnotationBoundingBox::height() const
+{
+  return rect().height();
+}
+
 void AnnotationBoundingBox::setCenter(const QPointF& center)
 {
   setRect(QRectF(center.x() - rect().width() / 2.f, center.y() - rect().height() / 2.f, rect().width(), rect().height()));
@@ -204,4 +219,14 @@ void AnnotationBoundingBox::updateColors()
   {
     this->setBrush(default_brush_);
   }
+}
+
+QString AnnotationBoundingBox::toString() const
+{
+  return QString("%1 %2 %3 %4")
+      .arg(label_id_)
+      .arg(center().x() / float(image_size_.width()))
+      .arg(center().y() / float(image_size_.height()))
+      .arg(width() / float(image_size_.width()))
+      .arg(height() / float(image_size_.height()));
 }

@@ -21,6 +21,10 @@ class AnnotationBoundingBox : public QGraphicsRectItem
 public:
   AnnotationBoundingBox(const QSize& image_size);
 
+  QPointF center() const;
+  float width() const;
+  float height() const;
+
   void setCenter(const QPointF& center);
   void setCornerPoints(const QPointF& p1, const QPointF& p2);
   void setXMin(const float x_min);
@@ -38,6 +42,8 @@ public:
   void select();
   void unselect();
   void setLabelID(int new_label_id);
+
+  QString toString() const;
 
 private:
   bool selected_{false};
