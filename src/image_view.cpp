@@ -12,10 +12,9 @@ ImageView::ImageView(QWidget* parent)
   setMouseTracking(true);
 }
 
-void ImageView::init(AnnotationManager* annotation_manager, std::optional<int>* selected_bbox_id)
+void ImageView::init(AnnotationManager* annotation_manager)
 {
   annotation_manager_ = annotation_manager;
-  selected_bbox_id_ = selected_bbox_id;
 }
 
 void ImageView::setImage(const QImage& image)
@@ -46,6 +45,9 @@ void ImageView::setImage(const QImage& image)
   }
 
   scene()->setSceneRect(image_item_->boundingRect());
+
+  edit_bbox_id_.reset();
+  selected_bbox_id_.reset();
 }
 
 bool ImageView::viewportEvent(QEvent* event)
@@ -167,7 +169,6 @@ bool ImageView::viewportEvent(QEvent* event)
     {
       if (annotation_manager_->latest()->rect().width() <= 1 || annotation_manager_->latest()->rect().height() <= 1)
       {
-        scene()->removeItem(annotation_manager_->latest());
         annotation_manager_->removeLatest();
       }
     }
@@ -199,24 +200,20 @@ void ImageView::mousePressEvent(QMouseEvent* event)
       // Case A: No bounding box under the cursor => Start new BBox!
       if (!bbox_part_under_cursor)
       {
-        if (*selected_bbox_id_)
+        if (selected_bbox_id_)
         {
-          int bbox_id = *(*selected_bbox_id_);
+          int bbox_id = *selected_bbox_id_;
           annotation_manager_->unselect(bbox_id);
-          *selected_bbox_id_ = {};
+          selected_bbox_id_.reset();
         };
 
         bbox_edit_mode_ = BoundingBoxEditMode::New;
 
-        annotation_manager_->add(
-            std::shared_ptr<AnnotationBoundingBox>(new AnnotationBoundingBox(QSize(image_item_->pixmap().size()))));
+        annotation_manager_->add(new AnnotationBoundingBox(QSize(image_item_->pixmap().size())));
         annotation_manager_->latest()->setLabelID(active_label_);
         annotation_manager_->latest()->setRect(QRectF(cursor_position, QSizeF(0, 0)));
 
         current_start_point_ = cursor_position;
-
-        // Show item!
-        scene()->addItem(annotation_manager_->latest());
       }
       // Case B: We found a bounding box under the cursor => Start editing / dragging!
       else
@@ -224,7 +221,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
         edit_bbox_id_ = bbox_part_under_cursor->first;
         edit_bbox_part_ = bbox_part_under_cursor->second;
 
-        std::shared_ptr<AnnotationBoundingBox> edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
+        AnnotationBoundingBox* edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
 
         switch (bbox_part_under_cursor->second)
         {
@@ -233,13 +230,13 @@ void ImageView::mousePressEvent(QMouseEvent* event)
           edit_bbox_offset_ = cursor_position - edit_bbox->rect().center();
 
           // Unselect previous BBox
-          if (*selected_bbox_id_)
+          if (selected_bbox_id_)
           {
-            annotation_manager_->unselect((*selected_bbox_id_).value());
+            annotation_manager_->unselect(selected_bbox_id_.value());
           }
 
           // Select new BBox
-          *selected_bbox_id_ = edit_bbox_id_;
+          selected_bbox_id_ = edit_bbox_id_;
           annotation_manager_->select(*edit_bbox_id_);
           break;
 
@@ -344,7 +341,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
   v_line_item_->setPos(cursor_position.x(), 0);
   h_line_item_->setPos(0, cursor_position.y());
 
-  std::shared_ptr<AnnotationBoundingBox> edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
+  AnnotationBoundingBox* edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
 
   switch (bbox_edit_mode_)
   {
@@ -427,17 +424,15 @@ void ImageView::keyPressEvent(QKeyEvent* event)
     break;
   }
 
-  if (*selected_bbox_id_)
+  if (selected_bbox_id_)
   {
-    std::shared_ptr<AnnotationBoundingBox> selected_bbox =
-        annotation_manager_->getAnnotationBoundingBox((*selected_bbox_id_).value());
+    AnnotationBoundingBox* selected_bbox = annotation_manager_->getAnnotationBoundingBox(selected_bbox_id_.value());
 
     if (remove_bbox)
     {
-      scene()->removeItem(selected_bbox.get());
-      annotation_manager_->remove((*selected_bbox_id_).value());
-      *selected_bbox_id_ = {};
-      edit_bbox_id_ = {};
+      annotation_manager_->remove(selected_bbox_id_.value());
+      selected_bbox_id_.reset();
+      edit_bbox_id_.reset();
     }
 
     selected_bbox->setLabelID(active_label_);

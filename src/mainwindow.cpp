@@ -13,7 +13,9 @@ MainWindow::MainWindow(QWidget* parent)
 {
   ui->setupUi(this);
 
-  ui->image_view->init(&annotation_manager_, &selected_bbox_id_);
+  annotation_manager_ = std::make_unique<AnnotationManager>(ui->image_view);
+
+  ui->image_view->init(annotation_manager_.get());
 
   ui->image_view->setScene(scene_);
   ui->image_view->setInteractive(true);
@@ -93,54 +95,15 @@ void MainWindow::openFolder(const QString& folder)
 
 void MainWindow::loadImage(const QString& image_filename)
 {
-  annotation_manager_.clear();
-
   const QFileInfo f(image_filename);
-
-  qDebug() << "f.filePath()=" << f.filePath();
-  qDebug() << "f.dir().path()=" << f.dir().path();
-  qDebug() << "f.baseName()=" << f.baseName();
-
   const QString label_filename = f.dir().path() + "/" + f.baseName() + ".txt";
 
-  qDebug() << "label_filename=" << label_filename;
-
+  // Load the image
   const QImage image(image_filename);
-
   ui->image_view->setImage(image);
 
-  QFile file(label_filename);
-  if (file.open(QIODevice::ReadOnly))
-  {
-    QTextStream in(&file);
-
-    while (!in.atEnd())
-    {
-      QString line = in.readLine();
-      QStringList fields = line.split(" ");
-
-      if (fields.size() == 5)
-      {
-        std::shared_ptr<AnnotationBoundingBox> new_bbox(new AnnotationBoundingBox(QSize(image.size())));
-
-        const float x_center = fields[1].toFloat() * image.width();
-        const float y_center = fields[2].toFloat() * image.height();
-        const float box_width = fields[3].toFloat() * image.width();
-        const float box_height = fields[4].toFloat() * image.height();
-
-        new_bbox->setRect(
-            QRectF(QPointF(x_center - box_width / 2.f, y_center - box_height / 2.f), QSizeF(box_width, box_height)));
-        new_bbox->setLabelID(fields[0].toInt());
-
-        // Show item!
-        ui->image_view->scene()->addItem(new_bbox.get());
-
-        annotation_manager_.add(new_bbox);
-      }
-    }
-
-    file.close();
-  }
+  // Load the annotations
+  annotation_manager_->loadFromFile(label_filename, image.size());
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

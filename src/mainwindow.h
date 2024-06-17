@@ -28,8 +28,7 @@ private:
   QSettings settings_{"YOLO", "Annotator"};
 
   QGraphicsScene* scene_{new QGraphicsScene(this)};
-  AnnotationManager annotation_manager_;
-  std::optional<int> selected_bbox_id_;
+  std::unique_ptr<AnnotationManager> annotation_manager_;
 
   QFileSystemModel folder_tree_model_;
 

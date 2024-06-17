@@ -1,12 +1,57 @@
 #include "annotation_manager.h"
 
-AnnotationManager::AnnotationManager()
+#include <QFile>
+
+AnnotationManager::AnnotationManager(ImageView* image_view)
+    : image_view_(image_view)
 {
 }
 
-void AnnotationManager::add(std::shared_ptr<AnnotationBoundingBox> new_bbox)
+void AnnotationManager::loadFromFile(const QString& label_filename, const QSize& image_size)
+{
+  this->clear();
+
+  QFile file(label_filename);
+  if (file.open(QIODevice::ReadOnly))
+  {
+    QTextStream in(&file);
+
+    while (!in.atEnd())
+    {
+      QString line = in.readLine();
+      QStringList fields = line.split(" ");
+
+      if (fields.size() == 5)
+      {
+        AnnotationBoundingBox* new_bbox = new AnnotationBoundingBox(image_size);
+
+        const float x_center = fields[1].toFloat() * image_size.width();
+        const float y_center = fields[2].toFloat() * image_size.height();
+        const float box_width = fields[3].toFloat() * image_size.width();
+        const float box_height = fields[4].toFloat() * image_size.height();
+
+        new_bbox->setRect(
+            QRectF(QPointF(x_center - box_width / 2.f, y_center - box_height / 2.f), QSizeF(box_width, box_height)));
+        new_bbox->setLabelID(fields[0].toInt());
+
+        this->add(new_bbox);
+      }
+    }
+
+    file.close();
+  }
+}
+
+void AnnotationManager::saveToFile(const QString& label_filename)
+{
+}
+
+void AnnotationManager::add(AnnotationBoundingBox* new_bbox)
 {
   annotation_bounding_boxes_.push_back(new_bbox);
+
+  // Show item!
+  image_view_->scene()->addItem(new_bbox);
 }
 
 void AnnotationManager::clear()
@@ -32,14 +77,14 @@ AnnotationBoundingBox* AnnotationManager::latest()
   }
   else
   {
-    return annotation_bounding_boxes_.back().get();
+    return annotation_bounding_boxes_.back();
   }
 }
 
 std::optional<std::pair<int, BoundingBoxPart>> AnnotationManager::getBoundingBoxPartUnderCursor(const QPointF& cursor_position)
 {
   int bbox_id = 0;
-  for (std::shared_ptr<AnnotationBoundingBox>& bbox : annotation_bounding_boxes_)
+  for (AnnotationBoundingBox* bbox : annotation_bounding_boxes_)
   {
     std::optional<BoundingBoxPart> part = bbox->getPart(cursor_position);
 
@@ -57,15 +102,24 @@ std::optional<std::pair<int, BoundingBoxPart>> AnnotationManager::getBoundingBox
 
 void AnnotationManager::removeLatest()
 {
+  image_view_->scene()->removeItem(annotation_bounding_boxes_.back());
   annotation_bounding_boxes_.pop_back();
 }
 
 void AnnotationManager::remove(int bbox_index)
 {
+  image_view_->scene()->removeItem(annotation_bounding_boxes_[bbox_index]);
   annotation_bounding_boxes_.remove(bbox_index);
 }
 
-std::shared_ptr<AnnotationBoundingBox> AnnotationManager::getAnnotationBoundingBox(int bbox_index)
+AnnotationBoundingBox* AnnotationManager::getAnnotationBoundingBox(int bbox_index)
 {
-  return annotation_bounding_boxes_[bbox_index];
+  if (annotation_bounding_boxes_.size() > bbox_index)
+  {
+    return annotation_bounding_boxes_[bbox_index];
+  }
+  else
+  {
+    return nullptr;
+  }
 }

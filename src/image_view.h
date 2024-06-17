@@ -5,6 +5,8 @@
 
 #include "annotation_manager.h"
 
+class AnnotationManager;
+
 enum class TouchMode
 {
   None,
@@ -28,7 +30,7 @@ class ImageView : public QGraphicsView
 public:
   ImageView(QWidget* parent = nullptr);
 
-  void init(AnnotationManager* annotation_manager, std::optional<int>* selected_bbox_id);
+  void init(AnnotationManager* annotation_manager);
 
   void setImage(const QImage& image);
 
@@ -42,7 +44,7 @@ public:
 
 private:
   AnnotationManager* annotation_manager_{nullptr};
-  std::optional<int>* selected_bbox_id_{nullptr};
+  std::optional<int> selected_bbox_id_;
 
   qreal totalScaleFactor = 1;
   QPointF total_movement_{0, 0};
