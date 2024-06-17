@@ -49,12 +49,12 @@ MainWindow::MainWindow(QWidget* parent)
   this->restoreState(settings_.value("window/state").toByteArray());
   ui->splitter->restoreState(settings_.value("splitter/state").toByteArray());
 
+  connect(ui->folder_tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectFolder);
+
+  connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
   openFolder("/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/");
 
   connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
-
-  // Load the first image
-  onLoadImage(1);
 
   connect(&prev_image_shortcut_, &QShortcut::activated, this, &MainWindow::onPrevImage);
   connect(&next_image_shortcut_, &QShortcut::activated, this, &MainWindow::onNextImage);
@@ -68,13 +68,25 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::onLoadImage(int image_id)
 {
-  QString image_filename = image_file_names_.at(image_id - 1);
+  if (image_file_names_.size() > 0)
+  {
+    QString image_filename = image_file_names_.at(image_id - 1);
 
-  ui->image_index_label->setText(QString("Image %1 / %2: %3").arg(image_id).arg(image_file_names_.size()).arg(image_filename));
+    ui->image_index_label->setText(QString("Image %1 / %2: %3").arg(image_id).arg(image_file_names_.size()).arg(image_filename));
 
-  annotation_manager_->save();
+    annotation_manager_->save();
 
-  loadImage(current_folder_.filePath(image_filename));
+    loadImage(current_folder_.filePath(image_filename));
+  }
+}
+
+void MainWindow::onSelectFolder(const QItemSelection& selected, const QItemSelection& deselected)
+{
+  if (selected.size() == 1)
+  {
+    const auto selected_index = selected.at(0).indexes().at(0);
+    openFolder(folder_tree_model_.filePath(selected_index));
+  }
 }
 
 void MainWindow::onPrevImage()
@@ -94,12 +106,15 @@ void MainWindow::openFolder(const QString& folder)
   ui->image_slider->setMinimum(1);
   ui->image_slider->setMaximum(image_file_names_.size());
   ui->image_slider->setValue(1);
+
+  // Load the first image of this folder
+  onLoadImage(1);
 }
 
 void MainWindow::loadImage(const QString& image_filename)
 {
   const QFileInfo f(image_filename);
-  const QString label_filename = f.dir().path() + "/" + f.baseName() + ".txt";
+  const QString label_filename = f.dir().path() + "/" + f.completeBaseName() + ".txt";
 
   // Load the image
   const QImage image(image_filename);

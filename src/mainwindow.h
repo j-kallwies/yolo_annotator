@@ -2,6 +2,7 @@
 
 #include <QFileSystemModel>
 #include <QGraphicsScene>
+#include <QItemSelection>
 #include <QMainWindow>
 #include <QScopedPointer>
 #include <QSettings>
@@ -45,6 +46,8 @@ private:
   void loadImage(const QString& image_filename);
 
   void closeEvent(QCloseEvent* event) override;
+
+  void onSelectFolder(const QItemSelection& selected, const QItemSelection& deselected);
 
 private slots:
   void onLoadImage(int idx);
