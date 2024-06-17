@@ -12,10 +12,9 @@ ImageView::ImageView(QWidget* parent)
   setMouseTracking(true);
 }
 
-void ImageView::init(QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes,
-                     std::optional<int>* selected_bbox_id)
+void ImageView::init(AnnotationManager* annotation_manager, std::optional<int>* selected_bbox_id)
 {
-  annotation_bounding_boxes_ = annotation_bounding_boxes;
+  annotation_manager_ = annotation_manager;
   selected_bbox_id_ = selected_bbox_id;
 }
 
@@ -47,25 +46,6 @@ void ImageView::setImage(const QImage& image)
   }
 
   scene()->setSceneRect(image_item_->boundingRect());
-}
-
-std::optional<std::pair<int, BoundingBoxPart>> ImageView::getBoundingBoxPartUnderCursor(const QPointF& cursor_position)
-{
-  int bbox_id = 0;
-  for (std::shared_ptr<AnnotationBoundingBox>& bbox : *annotation_bounding_boxes_)
-  {
-    std::optional<BoundingBoxPart> part = bbox->getPart(cursor_position);
-
-    if (part)
-    {
-      return std::make_pair(bbox_id, *part);
-    }
-
-    bbox_id++;
-  }
-
-  // Fallback
-  return {};
 }
 
 bool ImageView::viewportEvent(QEvent* event)
@@ -171,7 +151,7 @@ bool ImageView::viewportEvent(QEvent* event)
     //     bbox_edit_mode_ = BoundingBoxEditMode::New;
 
     //     annotation_bounding_boxes_->push_back(std::shared_ptr<AnnotationBoundingBox>(new AnnotationBoundingBox()));
-    //     annotation_bounding_boxes_->back()->setRect(
+    //     annotation_manager_->latest()->setRect(
     //         QRectF(mapToScene(mouse_event->position().x(), mouse_event->position().y()), QSizeF(100, 100)));
 
     //     // Show item!
@@ -185,10 +165,10 @@ bool ImageView::viewportEvent(QEvent* event)
   {
     if (bbox_edit_mode_ == BoundingBoxEditMode::New)
     {
-      if (annotation_bounding_boxes_->back()->rect().width() <= 1 || annotation_bounding_boxes_->back()->rect().height() <= 1)
+      if (annotation_manager_->latest()->rect().width() <= 1 || annotation_manager_->latest()->rect().height() <= 1)
       {
-        scene()->removeItem(annotation_bounding_boxes_->back().get());
-        annotation_bounding_boxes_->pop_back();
+        scene()->removeItem(annotation_manager_->latest());
+        annotation_manager_->removeLatest();
       }
     }
 
@@ -214,7 +194,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
   {
     if (bbox_edit_mode_ == BoundingBoxEditMode::None)
     {
-      const auto bbox_part_under_cursor = getBoundingBoxPartUnderCursor(cursor_position);
+      const auto bbox_part_under_cursor = annotation_manager_->getBoundingBoxPartUnderCursor(cursor_position);
 
       // Case A: No bounding box under the cursor => Start new BBox!
       if (!bbox_part_under_cursor)
@@ -222,21 +202,21 @@ void ImageView::mousePressEvent(QMouseEvent* event)
         if (*selected_bbox_id_)
         {
           int bbox_id = *(*selected_bbox_id_);
-          annotation_bounding_boxes_->at(bbox_id)->unselect();
+          annotation_manager_->unselect(bbox_id);
           *selected_bbox_id_ = {};
         };
 
         bbox_edit_mode_ = BoundingBoxEditMode::New;
 
-        annotation_bounding_boxes_->push_back(
+        annotation_manager_->add(
             std::shared_ptr<AnnotationBoundingBox>(new AnnotationBoundingBox(QSize(image_item_->pixmap().size()))));
-        annotation_bounding_boxes_->back()->setLabelID(active_label_);
-        annotation_bounding_boxes_->back()->setRect(QRectF(cursor_position, QSizeF(0, 0)));
+        annotation_manager_->latest()->setLabelID(active_label_);
+        annotation_manager_->latest()->setRect(QRectF(cursor_position, QSizeF(0, 0)));
 
         current_start_point_ = cursor_position;
 
         // Show item!
-        scene()->addItem(annotation_bounding_boxes_->back().get());
+        scene()->addItem(annotation_manager_->latest());
       }
       // Case B: We found a bounding box under the cursor => Start editing / dragging!
       else
@@ -244,23 +224,23 @@ void ImageView::mousePressEvent(QMouseEvent* event)
         edit_bbox_id_ = bbox_part_under_cursor->first;
         edit_bbox_part_ = bbox_part_under_cursor->second;
 
-        AnnotationBoundingBox& edit_bbox = *((*annotation_bounding_boxes_)[*edit_bbox_id_]);
+        std::shared_ptr<AnnotationBoundingBox> edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
 
         switch (bbox_part_under_cursor->second)
         {
         case BoundingBoxPart::CentralArea:
           bbox_edit_mode_ = BoundingBoxEditMode::DragFullBox;
-          edit_bbox_offset_ = cursor_position - edit_bbox.rect().center();
+          edit_bbox_offset_ = cursor_position - edit_bbox->rect().center();
 
           // Unselect previous BBox
           if (*selected_bbox_id_)
           {
-            (*annotation_bounding_boxes_)[(*selected_bbox_id_).value()]->unselect();
+            annotation_manager_->unselect((*selected_bbox_id_).value());
           }
 
           // Select new BBox
           *selected_bbox_id_ = edit_bbox_id_;
-          (*annotation_bounding_boxes_)[*edit_bbox_id_]->select();
+          annotation_manager_->select(*edit_bbox_id_);
           break;
 
         case BoundingBoxPart::CornerLowerLeft:
@@ -271,19 +251,19 @@ void ImageView::mousePressEvent(QMouseEvent* event)
           switch (edit_bbox_part_)
           {
           case BoundingBoxPart::CornerUpperLeft:
-            edit_bbox_static_opposite_point_ = edit_bbox.rect().bottomRight();
+            edit_bbox_static_opposite_point_ = edit_bbox->rect().bottomRight();
             break;
 
           case BoundingBoxPart::CornerUpperRight:
-            edit_bbox_static_opposite_point_ = edit_bbox.rect().bottomLeft();
+            edit_bbox_static_opposite_point_ = edit_bbox->rect().bottomLeft();
             break;
 
           case BoundingBoxPart::CornerLowerRight:
-            edit_bbox_static_opposite_point_ = edit_bbox.rect().topLeft();
+            edit_bbox_static_opposite_point_ = edit_bbox->rect().topLeft();
             break;
 
           case BoundingBoxPart::CornerLowerLeft:
-            edit_bbox_static_opposite_point_ = edit_bbox.rect().topRight();
+            edit_bbox_static_opposite_point_ = edit_bbox->rect().topRight();
             break;
           }
           break;
@@ -325,7 +305,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
 
   const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
 
-  auto bbox_under_cursor = getBoundingBoxPartUnderCursor(cursor_position);
+  auto bbox_under_cursor = annotation_manager_->getBoundingBoxPartUnderCursor(cursor_position);
 
   if (bbox_under_cursor)
   {
@@ -364,7 +344,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
   v_line_item_->setPos(cursor_position.x(), 0);
   h_line_item_->setPos(0, cursor_position.y());
 
-  AnnotationBoundingBox& edit_bbox = *((*annotation_bounding_boxes_)[*edit_bbox_id_]);
+  std::shared_ptr<AnnotationBoundingBox> edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
 
   switch (bbox_edit_mode_)
   {
@@ -374,11 +354,11 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
       current_start_point_ = cursor_position;
     }
 
-    annotation_bounding_boxes_->back()->setCornerPoints(*current_start_point_, cursor_position);
+    annotation_manager_->latest()->setCornerPoints(*current_start_point_, cursor_position);
     break;
 
   case BoundingBoxEditMode::DragFullBox:
-    edit_bbox.setCenter(cursor_position - edit_bbox_offset_);
+    edit_bbox->setCenter(cursor_position - edit_bbox_offset_);
     this->setCursor(QCursor(Qt::SizeAllCursor));
     break;
 
@@ -386,25 +366,25 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     switch (edit_bbox_part_)
     {
     case BoundingBoxPart::EdgeLeft:
-      edit_bbox.setXMin(cursor_position.x());
+      edit_bbox->setXMin(cursor_position.x());
       break;
 
     case BoundingBoxPart::EdgeRight:
-      edit_bbox.setXMax(cursor_position.x());
+      edit_bbox->setXMax(cursor_position.x());
       break;
 
     case BoundingBoxPart::EdgeTop:
-      edit_bbox.setYMin(cursor_position.y());
+      edit_bbox->setYMin(cursor_position.y());
       break;
 
     case BoundingBoxPart::EdgeBottom:
-      edit_bbox.setYMax(cursor_position.y());
+      edit_bbox->setYMax(cursor_position.y());
       break;
     }
     break;
 
   case BoundingBoxEditMode::DragCorner:
-    edit_bbox.setCornerPoints(edit_bbox_static_opposite_point_, cursor_position);
+    edit_bbox->setCornerPoints(edit_bbox_static_opposite_point_, cursor_position);
     break;
   }
 
@@ -449,13 +429,15 @@ void ImageView::keyPressEvent(QKeyEvent* event)
 
   if (*selected_bbox_id_)
   {
-    std::shared_ptr<AnnotationBoundingBox> selected_bbox = annotation_bounding_boxes_->at((*selected_bbox_id_).value());
+    std::shared_ptr<AnnotationBoundingBox> selected_bbox =
+        annotation_manager_->getAnnotationBoundingBox((*selected_bbox_id_).value());
 
     if (remove_bbox)
     {
       scene()->removeItem(selected_bbox.get());
-      annotation_bounding_boxes_->remove((*selected_bbox_id_).value());
+      annotation_manager_->remove((*selected_bbox_id_).value());
       *selected_bbox_id_ = {};
+      edit_bbox_id_ = {};
     }
 
     selected_bbox->setLabelID(active_label_);

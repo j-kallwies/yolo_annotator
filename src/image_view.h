@@ -3,7 +3,7 @@
 #include <QEvent>
 #include <QGraphicsView>
 
-#include "annotationboundingbox.h"
+#include "annotation_manager.h"
 
 enum class TouchMode
 {
@@ -28,7 +28,7 @@ class ImageView : public QGraphicsView
 public:
   ImageView(QWidget* parent = nullptr);
 
-  void init(QVector<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes, std::optional<int>* selected_bbox_id);
+  void init(AnnotationManager* annotation_manager, std::optional<int>* selected_bbox_id);
 
   void setImage(const QImage& image);
 
@@ -41,7 +41,7 @@ public:
   int active_label_{0};
 
 private:
-  QList<std::shared_ptr<AnnotationBoundingBox>>* annotation_bounding_boxes_{nullptr};
+  AnnotationManager* annotation_manager_{nullptr};
   std::optional<int>* selected_bbox_id_{nullptr};
 
   qreal totalScaleFactor = 1;
@@ -58,6 +58,4 @@ private:
   BoundingBoxPart edit_bbox_part_;
   QPointF edit_bbox_static_opposite_point_;
   QPointF edit_bbox_offset_;
-
-  std::optional<std::pair<int, BoundingBoxPart>> getBoundingBoxPartUnderCursor(const QPointF& cursor_position);
 };

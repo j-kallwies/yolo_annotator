@@ -7,7 +7,7 @@
 #include <QSettings>
 #include <QShortcut>
 
-#include "annotationboundingbox.h"
+#include "annotation_manager.h"
 
 namespace Ui
 {
@@ -28,7 +28,7 @@ private:
   QSettings settings_{"YOLO", "Annotator"};
 
   QGraphicsScene* scene_{new QGraphicsScene(this)};
-  QVector<std::shared_ptr<AnnotationBoundingBox>> annotation_bounding_boxes_;
+  AnnotationManager annotation_manager_;
   std::optional<int> selected_bbox_id_;
 
   QFileSystemModel folder_tree_model_;

@@ -27,6 +27,7 @@ set(SOURCE_FILES
     src/image_view.cpp
     src/annotationboundingbox.cpp
     src/label_colors.cpp
+    src/annotation_manager.cpp
 )
 
 set(HEADER_FILES
@@ -34,6 +35,7 @@ set(HEADER_FILES
     src/image_view.h
     src/annotationboundingbox.h
     src/label_colors.h
+    src/annotation_manager.h
 )
 
 add_project_meta(META_FILES_TO_INCLUDE)
