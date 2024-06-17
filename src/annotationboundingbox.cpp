@@ -223,7 +223,7 @@ void AnnotationBoundingBox::updateColors()
 
 QString AnnotationBoundingBox::toString() const
 {
-  return QString("%1 %2 %3 %4")
+  return QString("%1 %2 %3 %4 %5")
       .arg(label_id_)
       .arg(center().x() / float(image_size_.width()))
       .arg(center().y() / float(image_size_.height()))
