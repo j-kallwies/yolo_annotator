@@ -9,6 +9,8 @@ AnnotationManager::AnnotationManager(ImageView* image_view)
 
 void AnnotationManager::loadFromFile(const QString& label_filename, const QSize& image_size)
 {
+  label_filename_ = label_filename;
+
   this->clear();
 
   QFile file(label_filename);
@@ -44,6 +46,22 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
 
 void AnnotationManager::saveToFile(const QString& label_filename)
 {
+  QFile file(label_filename);
+  if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    QTextStream stream(&file);
+    for (const auto* bbox : annotation_bounding_boxes_)
+    {
+      stream << bbox->toString() << Qt::endl;
+    }
+
+    file.close();
+  }
+}
+
+void AnnotationManager::save()
+{
+  this->saveToFile(label_filename_);
 }
 
 void AnnotationManager::add(AnnotationBoundingBox* new_bbox)

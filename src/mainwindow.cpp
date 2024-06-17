@@ -51,9 +51,10 @@ MainWindow::MainWindow(QWidget* parent)
 
   openFolder("/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/");
 
-  loadImage("/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/IMG_0445.jpeg");
-
   connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
+
+  // Load the first image
+  onLoadImage(1);
 
   connect(&prev_image_shortcut_, &QShortcut::activated, this, &MainWindow::onPrevImage);
   connect(&next_image_shortcut_, &QShortcut::activated, this, &MainWindow::onNextImage);
@@ -70,6 +71,8 @@ void MainWindow::onLoadImage(int image_id)
   QString image_filename = image_file_names_.at(image_id - 1);
 
   ui->image_index_label->setText(QString("Image %1 / %2: %3").arg(image_id).arg(image_file_names_.size()).arg(image_filename));
+
+  annotation_manager_->save();
 
   loadImage(current_folder_.filePath(image_filename));
 }

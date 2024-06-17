@@ -13,6 +13,8 @@ public:
   void loadFromFile(const QString& label_filename, const QSize& image_size);
   void saveToFile(const QString& label_filename);
 
+  void save();
+
   void clear();
 
   void add(AnnotationBoundingBox* new_bbox);
@@ -31,4 +33,6 @@ public:
 private:
   QVector<AnnotationBoundingBox*> annotation_bounding_boxes_;
   ImageView* image_view_;
+
+  QString label_filename_;
 };
