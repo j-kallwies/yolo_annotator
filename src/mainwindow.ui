@@ -22,9 +22,34 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QComboBox" name="active_label_combobox">
+         <item>
+          <property name="text">
+           <string>multicopter</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>fixedwing</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>helicopter</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="fit_view_button">
          <property name="text">
-          <string>PushButton</string>
+          <string>Fit view to image</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
