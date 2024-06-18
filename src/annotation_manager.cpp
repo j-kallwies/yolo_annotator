@@ -73,6 +73,11 @@ void AnnotationManager::add(AnnotationBoundingBox* new_bbox)
 {
   annotation_bounding_boxes_.push_back(new_bbox);
 
+  if (new_bbox->labelID() == -1)
+  {
+    new_bbox->setLabelID(active_label_);
+  }
+
   // Show item!
   image_view_->scene()->addItem(new_bbox);
 }

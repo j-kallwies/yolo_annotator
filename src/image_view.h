@@ -40,8 +40,6 @@ public:
   void mouseReleaseEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
 
-  int active_label_{0};
-
 private:
   AnnotationManager* annotation_manager_{nullptr};
 

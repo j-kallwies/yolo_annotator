@@ -42,6 +42,7 @@ public:
   void select();
   void unselect();
   void setLabelID(int new_label_id);
+  int labelID() const;
 
   QString toString() const;
 
@@ -49,7 +50,7 @@ private:
   bool selected_{false};
   QBrush default_brush_;
   QBrush selected_brush_;
-  int label_id_{0};
+  int label_id_{-1};
 
   const QSize image_size_;
 

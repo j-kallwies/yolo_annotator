@@ -195,6 +195,11 @@ void AnnotationBoundingBox::setLabelID(int new_label_id)
   updateColors();
 }
 
+int AnnotationBoundingBox::labelID() const
+{
+  return label_id_;
+}
+
 void AnnotationBoundingBox::updateColors()
 {
   QPen pen;
