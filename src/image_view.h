@@ -32,7 +32,7 @@ public:
 
   void init(AnnotationManager* annotation_manager);
 
-  void setImage(const QImage& image);
+  void setImage(const QImage& image, const bool fit_view);
 
   bool viewportEvent(QEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;

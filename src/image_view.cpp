@@ -17,7 +17,7 @@ void ImageView::init(AnnotationManager* annotation_manager)
   annotation_manager_ = annotation_manager;
 }
 
-void ImageView::setImage(const QImage& image)
+void ImageView::setImage(const QImage& image, const bool fit_view)
 {
   scene()->clear();
   annotation_manager_->clear();

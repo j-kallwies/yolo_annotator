@@ -118,7 +118,7 @@ void MainWindow::loadImage(const QString& image_filename)
 
   // Load the image
   const QImage image(image_filename);
-  ui->image_view->setImage(image);
+  ui->image_view->setImage(image, ui->fit_view_button->isChecked());
 
   // Load the annotations
   annotation_manager_->loadFromFile(label_filename, image.size());
