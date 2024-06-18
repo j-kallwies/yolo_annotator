@@ -44,7 +44,6 @@ public:
 
 private:
   AnnotationManager* annotation_manager_{nullptr};
-  std::optional<int> selected_bbox_id_;
 
   qreal totalScaleFactor = 1;
   QPointF total_movement_{0, 0};

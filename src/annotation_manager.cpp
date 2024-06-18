@@ -42,6 +42,11 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
 
     file.close();
   }
+
+  if (this->annotation_bounding_boxes_.size() > 0)
+  {
+    select(0);
+  }
 }
 
 void AnnotationManager::saveToFile(const QString& label_filename)
@@ -80,11 +85,27 @@ void AnnotationManager::clear()
 void AnnotationManager::select(int bbox_index)
 {
   annotation_bounding_boxes_[bbox_index]->select();
+  selected_bbox_id_ = bbox_index;
 }
 
 void AnnotationManager::unselect(int bbox_index)
 {
   annotation_bounding_boxes_[bbox_index]->unselect();
+
+  if (selected_bbox_id_ && selected_bbox_id_.value() == bbox_index)
+  {
+    selected_bbox_id_.reset();
+  }
+}
+
+void AnnotationManager::unselect()
+{
+  for (const auto& bbox : annotation_bounding_boxes_)
+  {
+    bbox->unselect();
+  }
+
+  selected_bbox_id_.reset();
 }
 
 AnnotationBoundingBox* AnnotationManager::latest()
@@ -140,4 +161,22 @@ AnnotationBoundingBox* AnnotationManager::getAnnotationBoundingBox(int bbox_inde
   {
     return nullptr;
   }
+}
+
+void AnnotationManager::removeSelectedBoundingBox()
+{
+  if (selected_bbox_id_)
+  {
+    this->remove(selected_bbox_id_.value());
+  }
+}
+
+void AnnotationManager::activateLabel(const int label_id)
+{
+  if (selected_bbox_id_)
+  {
+    annotation_bounding_boxes_[*selected_bbox_id_]->setLabelID(label_id);
+  }
+
+  active_label_ = label_id;
 }

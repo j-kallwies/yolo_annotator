@@ -20,6 +20,10 @@ public:
   void add(AnnotationBoundingBox* new_bbox);
   void select(int bbox_index);
   void unselect(int bbox_index);
+  void unselect();
+
+  void activateLabel(const int label_id);
+  void removeSelectedBoundingBox();
 
   AnnotationBoundingBox* latest();
 
@@ -35,4 +39,8 @@ private:
   ImageView* image_view_;
 
   QString label_filename_;
+
+  std::optional<int> selected_bbox_id_;
+
+  int active_label_{0};
 };

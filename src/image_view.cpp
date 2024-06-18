@@ -20,6 +20,7 @@ void ImageView::init(AnnotationManager* annotation_manager)
 void ImageView::setImage(const QImage& image)
 {
   scene()->clear();
+  annotation_manager_->clear();
 
   image_item_ = new QGraphicsPixmapItem();
   image_item_->setPixmap(QPixmap::fromImage(image));
@@ -46,8 +47,13 @@ void ImageView::setImage(const QImage& image)
 
   scene()->setSceneRect(image_item_->boundingRect());
 
+  if (fit_view)
+  {
+    this->fitInView(image_item_, Qt::KeepAspectRatio);
+  }
+
   edit_bbox_id_.reset();
-  selected_bbox_id_.reset();
+  annotation_manager_->unselect();
 }
 
 bool ImageView::viewportEvent(QEvent* event)
@@ -200,12 +206,8 @@ void ImageView::mousePressEvent(QMouseEvent* event)
       // Case A: No bounding box under the cursor => Start new BBox!
       if (!bbox_part_under_cursor)
       {
-        if (selected_bbox_id_)
-        {
-          int bbox_id = *selected_bbox_id_;
-          annotation_manager_->unselect(bbox_id);
-          selected_bbox_id_.reset();
-        };
+        // Unselect any previously selected boundingbox
+        annotation_manager_->unselect();
 
         bbox_edit_mode_ = BoundingBoxEditMode::New;
 
@@ -230,13 +232,9 @@ void ImageView::mousePressEvent(QMouseEvent* event)
           edit_bbox_offset_ = cursor_position - edit_bbox->rect().center();
 
           // Unselect previous BBox
-          if (selected_bbox_id_)
-          {
-            annotation_manager_->unselect(selected_bbox_id_.value());
-          }
+          annotation_manager_->unselect();
 
           // Select new BBox
-          selected_bbox_id_ = edit_bbox_id_;
           annotation_manager_->select(*edit_bbox_id_);
           break;
 
@@ -399,42 +397,28 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageView::keyPressEvent(QKeyEvent* event)
 {
-  bool remove_bbox = false;
-
   switch (event->key())
   {
   case Qt::Key_Backspace:
-    remove_bbox = true;
+  case Qt::Key_Delete:
+    annotation_manager_->removeSelectedBoundingBox();
+    edit_bbox_id_.reset();
     break;
 
   case Qt::Key_1:
-    active_label_ = 0;
+    annotation_manager_->activateLabel(0);
     break;
 
   case Qt::Key_2:
-    active_label_ = 1;
+    annotation_manager_->activateLabel(1);
     break;
 
   case Qt::Key_3:
-    active_label_ = 2;
+    annotation_manager_->activateLabel(2);
     break;
 
   case Qt::Key_4:
-    active_label_ = 3;
+    annotation_manager_->activateLabel(3);
     break;
-  }
-
-  if (selected_bbox_id_)
-  {
-    AnnotationBoundingBox* selected_bbox = annotation_manager_->getAnnotationBoundingBox(selected_bbox_id_.value());
-
-    if (remove_bbox)
-    {
-      annotation_manager_->remove(selected_bbox_id_.value());
-      selected_bbox_id_.reset();
-      edit_bbox_id_.reset();
-    }
-
-    selected_bbox->setLabelID(active_label_);
   }
 }
