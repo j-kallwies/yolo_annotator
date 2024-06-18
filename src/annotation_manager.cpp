@@ -98,6 +98,50 @@ void AnnotationManager::unselect(int bbox_index)
   }
 }
 
+void AnnotationManager::selectPrevious()
+{
+  // If a bounding box is selected, move on to the next one
+  if (selected_bbox_id_)
+  {
+    int next_bbox_id = *selected_bbox_id_ - 1;
+
+    if (next_bbox_id < 0)
+    {
+      next_bbox_id = this->annotation_bounding_boxes_.size() - 1;
+    }
+
+    this->unselect(*selected_bbox_id_);
+    this->select(next_bbox_id);
+  }
+  // If no bounding box is selected, select the first one
+  else if (annotation_bounding_boxes_.size() > 0)
+  {
+    this->select(0);
+  }
+}
+
+void AnnotationManager::selectNext()
+{
+  // If a bounding box is selected, move on to the next one
+  if (selected_bbox_id_)
+  {
+    int next_bbox_id = *selected_bbox_id_ + 1;
+
+    if (next_bbox_id >= this->annotation_bounding_boxes_.size())
+    {
+      next_bbox_id = 0;
+    }
+
+    this->unselect(*selected_bbox_id_);
+    this->select(next_bbox_id);
+  }
+  // If no bounding box is selected, select the first one
+  else if (annotation_bounding_boxes_.size() > 0)
+  {
+    this->select(0);
+  }
+}
+
 void AnnotationManager::unselect()
 {
   for (const auto& bbox : annotation_bounding_boxes_)

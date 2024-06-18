@@ -420,5 +420,13 @@ void ImageView::keyPressEvent(QKeyEvent* event)
   case Qt::Key_4:
     annotation_manager_->activateLabel(3);
     break;
+
+  case Qt::Key_BracketLeft:
+    annotation_manager_->selectPrevious();
+    break;
+
+  case Qt::Key_BracketRight:
+    annotation_manager_->selectNext();
+    break;
   }
 }

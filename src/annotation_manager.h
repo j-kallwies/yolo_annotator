@@ -22,6 +22,9 @@ public:
   void unselect(int bbox_index);
   void unselect();
 
+  void selectPrevious();
+  void selectNext();
+
   void activateLabel(const int label_id);
   void removeSelectedBoundingBox();
 
