@@ -14,10 +14,10 @@ QColor LabelColors::colorForLabelId(const int label_id)
     return QColor(0.302 * 255, 0.686 * 255, 0.290 * 255);
 
   case 3:
-    return QColor(0.40 * 255, 0.761 * 255, 0.647 * 255);
+    return QColor(1.00 * 255, 0.498 * 255, 0.0 * 255);
 
   case 4:
-    return QColor(1.00 * 255, 0.498 * 255, 0.0 * 255);
+    return QColor(0.40 * 255, 0.761 * 255, 0.647 * 255);
 
   case 5:
     return QColor(0.651 * 255, 0.337 * 255, 0.157 * 255);
