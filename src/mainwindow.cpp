@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(&prev_image_shortcut_, &QShortcut::activated, this, &MainWindow::onPrevImage);
   connect(&next_image_shortcut_, &QShortcut::activated, this, &MainWindow::onNextImage);
 
+  connect(&remove_image_shortcut_, &QShortcut::activated, this, &MainWindow::onRemoveImage);
+
   connect(&move_to_train_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTrain);
   connect(&move_to_val_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToVal);
   connect(&move_to_test_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTest);
@@ -105,6 +107,25 @@ void MainWindow::onPrevImage()
 void MainWindow::onNextImage()
 {
   ui->image_slider->setValue(ui->image_slider->value() + 1);
+}
+
+void MainWindow::onRemoveImage()
+{
+  const QString image_filename = image_file_names_.at(ui->image_slider->value() - 1);
+  const QString label_filename = getLabelFilename(image_filename);
+
+  qDebug() << "Remove " << QFile(current_folder_.absoluteFilePath(image_filename)).fileName();
+  qDebug() << "Remove " << QFile(current_folder_.absoluteFilePath(label_filename)).fileName();
+
+  QFile(current_folder_.absoluteFilePath(image_filename)).moveToTrash();
+  QFile(current_folder_.absoluteFilePath(label_filename)).moveToTrash();
+
+  // Remove the image from the list
+  image_file_names_.removeAt(ui->image_slider->value() - 1);
+
+  // "Reload" => Load next image
+  ui->image_slider->setMaximum(image_file_names_.size());
+  onLoadImage(ui->image_slider->value());
 }
 
 void MainWindow::moveCurrentImageToFolder(const QString& folder)
