@@ -25,6 +25,8 @@ public:
   float width() const;
   float height() const;
 
+  void setRect(const QRectF& r);
+
   void setCenter(const QPointF& center);
   void setCornerPoints(const QPointF& p1, const QPointF& p2);
   void setXMin(const float x_min);

@@ -235,3 +235,8 @@ QString AnnotationBoundingBox::toString() const
       .arg(width() / float(image_size_.width()))
       .arg(height() / float(image_size_.height()));
 }
+
+void AnnotationBoundingBox::setRect(const QRectF& r)
+{
+  QGraphicsRectItem::setRect(r.intersected(QRectF(QPointF(0, 0), image_size_)));
+}
