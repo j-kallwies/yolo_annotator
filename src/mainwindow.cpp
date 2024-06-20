@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget* parent)
   ui->image_view->setScene(scene_);
   ui->image_view->setInteractive(true);
 
-  // folder_tree_model_.setOption(QFileSystemModel::DontWatchForChanges);
+  folder_tree_model_.setOption(QFileSystemModel::DontWatchForChanges);
 
   const QString rootPath = "/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/";
 
