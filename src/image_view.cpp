@@ -52,6 +52,8 @@ void ImageView::setImage(const QImage& image, const bool fit_view)
     this->fitInView(image_item_, Qt::KeepAspectRatio);
   }
 
+  current_total_scale_factor_ = this->transform().m11();
+
   edit_bbox_id_.reset();
   annotation_manager_->unselect();
 }
