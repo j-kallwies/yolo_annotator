@@ -28,12 +28,12 @@ float AnnotationBoundingBox::height() const
 
 void AnnotationBoundingBox::setCenter(const QPointF& center)
 {
-  setRect(QRectF(center.x() - rect().width() / 2.f, center.y() - rect().height() / 2.f, rect().width(), rect().height()));
+  this->setRect(QRectF(center.x() - rect().width() / 2.f, center.y() - rect().height() / 2.f, rect().width(), rect().height()));
 }
 
 void AnnotationBoundingBox::setCornerPoints(const QPointF& p1, const QPointF& p2)
 {
-  this->setRect(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()), std::abs(p1.x() - p2.x()), std::abs(p1.y() - p2.y()));
+  this->setRect(QRectF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()), std::abs(p1.x() - p2.x()), std::abs(p1.y() - p2.y())));
 }
 
 void AnnotationBoundingBox::setXMin(const float x_min)
