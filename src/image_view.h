@@ -43,7 +43,7 @@ public:
 private:
   AnnotationManager* annotation_manager_{nullptr};
 
-  qreal totalScaleFactor = 1;
+  qreal current_total_scale_factor_ = 1;
   QPointF total_movement_{0, 0};
   TouchMode touch_mode_{TouchMode::None};
   std::optional<QPointF> current_start_point_;

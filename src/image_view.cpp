@@ -118,13 +118,14 @@ bool ImageView::viewportEvent(QEvent* event)
         // if one of the fingers is released, remember the current scale
         // factor so that adding another finger later will continue zooming
         // by adding new scale factor to the existing remembered value.
-        totalScaleFactor *= currentScaleFactor;
+        current_total_scale_factor_ *= currentScaleFactor;
         currentScaleFactor = 1;
 
         touch_mode_ = TouchMode::None;
       }
       setTransformationAnchor(AnchorUnderMouse);
-      setTransform(QTransform::fromScale(totalScaleFactor * currentScaleFactor, totalScaleFactor * currentScaleFactor));
+      setTransform(QTransform::fromScale(current_total_scale_factor_ * currentScaleFactor,
+                                         current_total_scale_factor_ * currentScaleFactor));
 
       // Update
       // qDebug() << "Current scale: " << transform().m11();
