@@ -49,13 +49,17 @@ void ImageView::setImage(const QImage& image, const bool fit_view)
 
   if (fit_view)
   {
-    this->fitInView(image_item_, Qt::KeepAspectRatio);
+    fitViewToImage();
   }
-
-  current_total_scale_factor_ = this->transform().m11();
 
   edit_bbox_id_.reset();
   annotation_manager_->unselect();
+}
+
+void ImageView::fitViewToImage()
+{
+  this->fitInView(image_item_, Qt::KeepAspectRatio);
+  current_total_scale_factor_ = this->transform().m11();
 }
 
 bool ImageView::viewportEvent(QEvent* event)

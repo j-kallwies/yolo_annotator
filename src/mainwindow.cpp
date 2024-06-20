@@ -74,6 +74,16 @@ MainWindow::MainWindow(QWidget* parent)
 
   next_image_shortcut_.setAutoRepeat(true);
   next_image_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
+
+  connect(ui->fit_view_button,
+          &QPushButton::clicked,
+          [this](const bool checked)
+          {
+            if (checked)
+            {
+              ui->image_view->fitViewToImage();
+            }
+          });
 }
 
 void MainWindow::onLoadImage(int image_id)
