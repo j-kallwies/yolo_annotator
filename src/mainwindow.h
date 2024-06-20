@@ -41,6 +41,10 @@ private:
   QShortcut prev_image_shortcut_{QKeySequence(Qt::Key_Left), this};
   QShortcut next_image_shortcut_{QKeySequence(Qt::Key_Right), this};
 
+  QShortcut move_to_train_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_Return), this};
+  QShortcut move_to_val_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_V), this};
+  QShortcut move_to_test_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_T), this};
+
   void openFolder(const QString& folder);
 
   void loadImage(const QString& image_filename);
@@ -53,4 +57,13 @@ private slots:
   void onLoadImage(int idx);
   void onPrevImage();
   void onNextImage();
+
+  void moveCurrentImageToFolder(const QString& folder);
+
+  void onMoveImageToTrain();
+  void onMoveImageToVal();
+  void onMoveImageToTest();
+
+private:
+  static QString getLabelFilename(const QString& image_filename);
 };

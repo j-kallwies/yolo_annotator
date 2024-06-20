@@ -59,6 +59,14 @@ MainWindow::MainWindow(QWidget* parent)
   connect(&prev_image_shortcut_, &QShortcut::activated, this, &MainWindow::onPrevImage);
   connect(&next_image_shortcut_, &QShortcut::activated, this, &MainWindow::onNextImage);
 
+  connect(&move_to_train_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTrain);
+  connect(&move_to_val_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToVal);
+  connect(&move_to_test_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTest);
+
+  move_to_train_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
+  move_to_val_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
+  move_to_test_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
+
   prev_image_shortcut_.setAutoRepeat(true);
   prev_image_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
 
@@ -99,6 +107,62 @@ void MainWindow::onNextImage()
   ui->image_slider->setValue(ui->image_slider->value() + 1);
 }
 
+void MainWindow::moveCurrentImageToFolder(const QString& folder)
+{
+  // Make sure that the latest changes are saved.
+  annotation_manager_->save();
+
+  const QString image_filename = image_file_names_.at(ui->image_slider->value() - 1);
+  const QString label_filename = getLabelFilename(image_filename);
+
+  // TODO: also make possible sibling folders! (e.g. train -> val)
+  QString rel_new_folder = folder;
+
+  QString new_image_filename = rel_new_folder + QDir::separator() + image_filename;
+  QString new_label_filename = rel_new_folder + QDir::separator() + label_filename;
+
+  qDebug() << "moveCurrentImageToFolder()";
+
+  qDebug() << "image_filename=" << image_filename;
+  qDebug() << "new_image_filename=" << new_image_filename;
+
+  qDebug() << "label_filename=" << label_filename;
+  qDebug() << "new_label_filename=" << new_label_filename;
+
+  current_folder_.mkpath(rel_new_folder);
+
+  // Move the image file
+  current_folder_.rename(image_filename, new_image_filename);
+
+  // Move the label file
+  current_folder_.rename(label_filename, new_label_filename);
+
+  // Remove the image from the list
+  image_file_names_.removeAt(ui->image_slider->value() - 1);
+
+  // "Reload" => Load next image
+  ui->image_slider->setMaximum(image_file_names_.size());
+  onLoadImage(ui->image_slider->value());
+}
+
+void MainWindow::onMoveImageToTrain()
+{
+  qDebug() << "onMoveImageToTrain()";
+  moveCurrentImageToFolder("train");
+}
+
+void MainWindow::onMoveImageToVal()
+{
+  qDebug() << "onMoveImageToVal()";
+  moveCurrentImageToFolder("val");
+}
+
+void MainWindow::onMoveImageToTest()
+{
+  qDebug() << "onMoveImageToTest()";
+  moveCurrentImageToFolder("test");
+}
+
 void MainWindow::openFolder(const QString& folder)
 {
   current_folder_ = QDir(folder);
@@ -111,10 +175,15 @@ void MainWindow::openFolder(const QString& folder)
   onLoadImage(1);
 }
 
-void MainWindow::loadImage(const QString& image_filename)
+QString MainWindow::getLabelFilename(const QString& image_filename)
 {
   const QFileInfo f(image_filename);
-  const QString label_filename = f.dir().path() + "/" + f.completeBaseName() + ".txt";
+  return f.dir().path() + "/" + f.completeBaseName() + ".txt";
+}
+
+void MainWindow::loadImage(const QString& image_filename)
+{
+  const QString label_filename = getLabelFilename(image_filename);
 
   // Load the image
   const QImage image(image_filename);
