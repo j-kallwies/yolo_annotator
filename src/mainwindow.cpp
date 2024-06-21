@@ -1,5 +1,6 @@
 #include <QFileIconProvider>
 #include <QGraphicsPixmapItem>
+#include <QRandomGenerator>
 
 #include <memory>
 
@@ -60,6 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 
   connect(&remove_image_shortcut_, &QShortcut::activated, this, &MainWindow::onRemoveImage);
 
+  connect(&move_to_random_set_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToRandomSet);
   connect(&move_to_train_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTrain);
   connect(&move_to_val_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToVal);
   connect(&move_to_test_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTest);
@@ -165,6 +167,33 @@ void MainWindow::moveCurrentImageToFolder(const QString& folder)
   // "Reload" => Load next image
   ui->image_slider->setMaximum(image_file_names_.size());
   onLoadImage(ui->image_slider->value());
+}
+
+void MainWindow::onMoveImageToRandomSet()
+{
+  const int v = QRandomGenerator::system()->bounded(0, 10);
+
+  switch (v)
+  {
+  case 0:
+  case 1:
+  case 2:
+  case 3:
+  case 4:
+  case 5:
+  case 6:
+  case 7:
+    moveCurrentImageToFolder("train");
+    break;
+
+  case 8:
+    moveCurrentImageToFolder("val");
+    break;
+
+  case 9:
+    moveCurrentImageToFolder("test");
+    break;
+  }
 }
 
 void MainWindow::onMoveImageToTrain()
