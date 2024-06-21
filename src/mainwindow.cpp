@@ -24,19 +24,17 @@ MainWindow::MainWindow(QWidget* parent)
 
   folder_tree_model_.setOption(QFileSystemModel::DontWatchForChanges);
 
-  const QString rootPath = "/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/";
-
   // QFileIconProvider iconProvider;
   // folder_tree_model_.setIconProvider(&iconProvider);
-  folder_tree_model_.setRootPath(rootPath);
+  folder_tree_model_.setRootPath(root_path_);
 
   folder_tree_model_.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
   ui->folder_tree_view->setModel(&folder_tree_model_);
 
-  if (!rootPath.isEmpty())
+  if (!root_path_.isEmpty())
   {
-    const QModelIndex rootIndex = folder_tree_model_.index(QDir::cleanPath(rootPath));
+    const QModelIndex rootIndex = folder_tree_model_.index(QDir::cleanPath(root_path_));
     if (rootIndex.isValid())
       ui->folder_tree_view->setRootIndex(rootIndex);
   }
@@ -53,7 +51,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(ui->folder_tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectFolder);
 
   connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
-  openFolder("/Users/jan/Library/Mobile Documents/com~apple~CloudDocs/Documents/yolo_data/");
+  openFolder("/Users/jan/yolo_data/");
 
   connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
 

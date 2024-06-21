@@ -24,6 +24,8 @@ public:
   virtual ~MainWindow();
 
 private:
+  const QString root_path_{"/Users/jan/yolo_data/"};
+
   QScopedPointer<Ui::MainWindow> ui;
 
   QSettings settings_{"YOLO", "Annotator"};
