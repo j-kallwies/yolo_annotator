@@ -43,6 +43,8 @@ private:
 
   QShortcut remove_image_shortcut_{QKeySequence{Qt::CTRL | Qt::Key_Backspace}, this};
 
+  QShortcut edit_image_shortcut_{QKeySequence{Qt::CTRL | Qt::Key_E}, this};
+
   QShortcut move_to_random_set_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_R), this};
   QShortcut move_to_train_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_Return), this};
   QShortcut move_to_val_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_V), this};
@@ -60,6 +62,8 @@ private slots:
   void onLoadImage(int idx);
   void onPrevImage();
   void onNextImage();
+
+  void onEditImage();
 
   void onRemoveImage();
 

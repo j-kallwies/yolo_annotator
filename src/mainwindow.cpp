@@ -1,5 +1,6 @@
 #include <QFileIconProvider>
 #include <QGraphicsPixmapItem>
+#include <QProcess>
 #include <QRandomGenerator>
 
 #include <memory>
@@ -61,6 +62,8 @@ MainWindow::MainWindow(QWidget* parent)
 
   connect(&remove_image_shortcut_, &QShortcut::activated, this, &MainWindow::onRemoveImage);
 
+  connect(&edit_image_shortcut_, &QShortcut::activated, this, &MainWindow::onEditImage);
+
   connect(&move_to_random_set_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToRandomSet);
   connect(&move_to_train_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTrain);
   connect(&move_to_val_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToVal);
@@ -118,6 +121,17 @@ void MainWindow::onPrevImage()
 void MainWindow::onNextImage()
 {
   ui->image_slider->setValue(ui->image_slider->value() + 1);
+}
+
+void MainWindow::onEditImage()
+{
+  QProcess* image_editor_process = new QProcess(this);
+
+  QStringList arguments;
+  arguments << "-a"
+            << "Affinity Photo 2.app" << current_folder_.absoluteFilePath(image_file_names_.at(ui->image_slider->value() - 1));
+
+  image_editor_process->start("open", arguments);
 }
 
 void MainWindow::onRemoveImage()
