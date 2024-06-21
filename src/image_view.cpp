@@ -342,8 +342,11 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     this->setCursor(QCursor(Qt::CrossCursor));
   }
 
-  v_line_item_->setPos(cursor_position.x(), 0);
-  h_line_item_->setPos(0, cursor_position.y());
+  if (v_line_item_ && h_line_item_)
+  {
+    v_line_item_->setPos(cursor_position.x(), 0);
+    h_line_item_->setPos(0, cursor_position.y());
+  }
 
   AnnotationBoundingBox* edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
 
