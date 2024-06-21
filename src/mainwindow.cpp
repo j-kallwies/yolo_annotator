@@ -27,7 +27,6 @@ MainWindow::MainWindow(QWidget* parent)
   // QFileIconProvider iconProvider;
   // folder_tree_model_.setIconProvider(&iconProvider);
   folder_tree_model_.setRootPath(rootPath);
-  // folder_tree_model_.setRootPath("/Users/jan/");
 
   folder_tree_model_.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
@@ -152,14 +151,6 @@ void MainWindow::moveCurrentImageToFolder(const QString& folder)
   QString new_image_filename = rel_new_folder + QDir::separator() + image_filename;
   QString new_label_filename = rel_new_folder + QDir::separator() + label_filename;
 
-  qDebug() << "moveCurrentImageToFolder()";
-
-  qDebug() << "image_filename=" << image_filename;
-  qDebug() << "new_image_filename=" << new_image_filename;
-
-  qDebug() << "label_filename=" << label_filename;
-  qDebug() << "new_label_filename=" << new_label_filename;
-
   current_folder_.mkpath(rel_new_folder);
 
   // Move the image file
@@ -178,19 +169,16 @@ void MainWindow::moveCurrentImageToFolder(const QString& folder)
 
 void MainWindow::onMoveImageToTrain()
 {
-  qDebug() << "onMoveImageToTrain()";
   moveCurrentImageToFolder("train");
 }
 
 void MainWindow::onMoveImageToVal()
 {
-  qDebug() << "onMoveImageToVal()";
   moveCurrentImageToFolder("val");
 }
 
 void MainWindow::onMoveImageToTest()
 {
-  qDebug() << "onMoveImageToTest()";
   moveCurrentImageToFolder("test");
 }
 
