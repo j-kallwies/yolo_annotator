@@ -46,4 +46,6 @@ private:
   std::optional<int> selected_bbox_id_;
 
   int active_label_{0};
+
+  bool cleared_{false};
 };

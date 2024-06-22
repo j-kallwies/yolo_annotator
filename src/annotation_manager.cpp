@@ -47,10 +47,18 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
   {
     select(0);
   }
+
+  this->cleared_ = false;
 }
 
 void AnnotationManager::saveToFile(const QString& label_filename)
 {
+  // Cancel saving in case of a cleared state!
+  if (this->cleared_)
+  {
+    return;
+  }
+
   QFile file(label_filename);
   if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
@@ -85,6 +93,7 @@ void AnnotationManager::add(AnnotationBoundingBox* new_bbox)
 void AnnotationManager::clear()
 {
   annotation_bounding_boxes_.clear();
+  this->cleared_ = true;
 }
 
 void AnnotationManager::select(int bbox_index)
