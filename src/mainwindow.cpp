@@ -183,6 +183,7 @@ void MainWindow::moveCurrentImageToFolder(const QString& folder)
 
   // Move the label file
   current_folder_.rename(label_filename, new_label_filename);
+  annotation_manager_->clear();
 
   // Remove the image from the list
   image_file_names_.removeAt(ui->image_slider->value() - 1);
