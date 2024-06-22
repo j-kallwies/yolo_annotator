@@ -86,6 +86,17 @@ MainWindow::MainWindow(QWidget* parent)
               ui->image_view->fitViewToImage();
             }
           });
+
+  // Load CNN weight files
+  {
+    ui->cnn_model->clear();
+    QStringList pt_files = QDir(root_path_).entryList({"*.pt"}, QDir::Filter::Files, QDir::Name);
+
+    for (const auto pt_filename : pt_files)
+    {
+      ui->cnn_model->addItem(pt_filename);
+    }
+  }
 }
 
 void MainWindow::onLoadImage(int image_id)
