@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QItemSelection>
 #include <QMainWindow>
+#include <QProcess>
 #include <QScopedPointer>
 #include <QSettings>
 #include <QShortcut>
@@ -52,6 +53,8 @@ private:
   QShortcut move_to_val_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_V), this};
   QShortcut move_to_test_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_T), this};
 
+  QProcess predict_process_{this};
+
   void openFolder(const QString& folder);
 
   void loadImage(const QString& image_filename);
@@ -75,6 +78,8 @@ private slots:
   void onMoveImageToTrain();
   void onMoveImageToVal();
   void onMoveImageToTest();
+
+  void onStartPrediction(bool checked);
 
 private:
   static QString getLabelFilename(const QString& image_filename);

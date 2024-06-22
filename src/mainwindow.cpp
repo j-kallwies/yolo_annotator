@@ -66,6 +66,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(&move_to_train_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTrain);
   connect(&move_to_val_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToVal);
   connect(&move_to_test_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTest);
+  connect(ui->predict_button, &QPushButton::clicked, this, &MainWindow::onStartPrediction);
+
 
   move_to_train_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
   move_to_val_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
@@ -86,6 +88,20 @@ MainWindow::MainWindow(QWidget* parent)
               ui->image_view->fitViewToImage();
             }
           });
+
+  connect(&predict_process_,
+          &QProcess::readyRead,
+          [this]()
+          {
+            if (predict_process_.canReadLine())
+            {
+              ui->predict_command_output->moveCursor(QTextCursor::End);
+              ui->predict_command_output->insertPlainText(QString::fromStdString(predict_process_.readLine().toStdString()));
+              ui->predict_command_output->moveCursor(QTextCursor::End);
+            }
+          });
+
+  connect(&predict_process_, &QProcess::terminate, [this]() { qDebug() << "YOLO terminated."; });
 
   // Load CNN weight files
   {
@@ -233,6 +249,47 @@ void MainWindow::onMoveImageToVal()
 void MainWindow::onMoveImageToTest()
 {
   moveCurrentImageToFolder("test");
+}
+
+void MainWindow::onStartPrediction(bool checked)
+{
+  qDebug() << "predict_process_ start!";
+
+  predict_process_.setProgram("/opt/homebrew/anaconda3/bin/yolo");
+
+  const QString folder_name = QDir(root_path_).relativeFilePath(current_folder_.path());
+
+  QStringList args;
+  args.append("predict");
+  args.append(QString("model=%1").arg(ui->cnn_model->currentText()));
+  args.append(QString("source='%1'").arg(folder_name));
+  args.append(QString("imgsz=%1").arg(ui->cnn_image_size->currentText()));
+  args.append(QString("project='%1'").arg(folder_name));
+  args.append(QString("name=pred_%1_%2").arg(ui->cnn_image_size->currentText()).arg(ui->cnn_model->currentText()));
+  args.append("save_txt=True");
+  args.append("save=True");
+  args.append("device=mps"); // TODO!
+
+  predict_process_.setWorkingDirectory(root_path_);
+
+  predict_process_.setArguments(args);
+
+  predict_process_.start();
+
+  ui->predict_command_output->clear();
+
+  if (predict_process_.waitForStarted())
+  {
+    ui->predict_command_output->moveCursor(QTextCursor::End);
+    ui->predict_command_output->insertPlainText("YOLO started...");
+    ui->predict_command_output->moveCursor(QTextCursor::End);
+  }
+  else
+  {
+    ui->predict_command_output->moveCursor(QTextCursor::End);
+    ui->predict_command_output->insertPlainText("COULD NOT START YOLO!");
+    ui->predict_command_output->moveCursor(QTextCursor::End);
+  }
 }
 
 void MainWindow::openFolder(const QString& folder)
