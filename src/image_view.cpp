@@ -342,7 +342,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     this->setCursor(QCursor(Qt::CrossCursor));
   }
 
-  if (v_line_item_ && h_line_item_)
+  if (v_line_item_ && h_line_item_ && scene()->items().size() > 0)
   {
     v_line_item_->setPos(cursor_position.x(), 0);
     h_line_item_->setPos(0, cursor_position.y());
