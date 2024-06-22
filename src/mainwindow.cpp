@@ -258,7 +258,14 @@ void MainWindow::loadImage(const QString& image_filename)
   const QString label_filename = getLabelFilename(image_filename);
 
   // Load the image
-  const QImage image(image_filename);
+  QImage image(image_filename);
+
+  if (ui->scale_to_cnn_resolution->isChecked())
+  {
+    const int cnn_image_size = QString(ui->cnn_image_size->currentText()).toInt();
+    image = image.scaled(cnn_image_size, cnn_image_size, Qt::KeepAspectRatio);
+  }
+
   ui->image_view->setImage(image, ui->fit_view_button->isChecked());
 
   // Load the annotations
