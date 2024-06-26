@@ -28,25 +28,6 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QComboBox" name="active_label_combobox">
-         <item>
-          <property name="text">
-           <string>multicopter</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>fixedwing</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>helicopter</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="scale_to_cnn_resolution">
          <property name="text">
           <string>Scale to CNN resolution</string>
