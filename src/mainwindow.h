@@ -79,6 +79,8 @@ private slots:
   void onMoveImageToVal();
   void onMoveImageToTest();
 
+  void onUpdateFiltering();
+
   void onStartPrediction(bool checked);
 
 private:

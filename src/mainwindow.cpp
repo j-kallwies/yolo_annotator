@@ -68,6 +68,10 @@ MainWindow::MainWindow(QWidget* parent)
   connect(&move_to_test_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTest);
   connect(ui->predict_button, &QPushButton::clicked, this, &MainWindow::onStartPrediction);
 
+  connect(ui->min_num_objects, SIGNAL(valueChanged(int)), this, SLOT(onUpdateFiltering()));
+  connect(ui->max_num_objects, SIGNAL(valueChanged(int)), this, SLOT(onUpdateFiltering()));
+  connect(ui->min_rel_bbox_size, SIGNAL(valueChanged(double)), this, SLOT(onUpdateFiltering()));
+  connect(ui->max_rel_bbox_size, SIGNAL(valueChanged(double)), this, SLOT(onUpdateFiltering()));
 
   move_to_train_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
   move_to_val_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
@@ -126,6 +130,22 @@ void MainWindow::onLoadImage(int image_id)
     annotation_manager_->save();
 
     loadImage(current_folder_.filePath(image_filename));
+  }
+}
+
+void MainWindow::onUpdateFiltering()
+{
+  if (ui->enable_image_filtering->isChecked())
+  {
+    const auto selected_indices = ui->folder_tree_view->selectionModel()->selectedIndexes();
+
+    qDebug() << "selected_indices.size()=" << selected_indices.size();
+
+    if (selected_indices.size() > 0)
+    {
+      const auto selected_index = selected_indices.at(0);
+      openFolder(folder_tree_model_.filePath(selected_index));
+    }
   }
 }
 
@@ -295,7 +315,75 @@ void MainWindow::onStartPrediction(bool checked)
 void MainWindow::openFolder(const QString& folder)
 {
   current_folder_ = QDir(folder);
-  image_file_names_ = current_folder_.entryList(image_filename_filter_, QDir::Filter::Files, QDir::Name);
+  QStringList all_image_file_names = current_folder_.entryList(image_filename_filter_, QDir::Filter::Files, QDir::Name);
+
+  image_file_names_.clear();
+
+  if (ui->enable_image_filtering->isChecked())
+  {
+    for (const QString& image_filename : all_image_file_names)
+    {
+      QString label_filename = getLabelFilename(image_filename);
+
+      int num_objects = 0;
+      float min_rel_objet_size = std::numeric_limits<float>::infinity();
+      float max_rel_objet_size = 0.f;
+
+      QFile file(current_folder_.absoluteFilePath(label_filename));
+      if (file.open(QIODevice::ReadOnly))
+      {
+        QTextStream in(&file);
+
+        while (!in.atEnd())
+        {
+          QString line = in.readLine();
+
+          QStringList fields = line.split(" ");
+
+          if (fields.size() == 5)
+          {
+            num_objects++;
+
+            const float rel_box_width = fields[3].toFloat();
+            const float rel_box_height = fields[4].toFloat();
+
+            min_rel_objet_size = std::min(rel_box_width, std::min(rel_box_height, min_rel_objet_size));
+            max_rel_objet_size = std::max(rel_box_width, std::max(rel_box_height, max_rel_objet_size));
+          }
+        }
+
+        file.close();
+      }
+
+      // TODO: Do filtering!
+      bool use_image = true;
+
+      // Image Filtering
+      {
+        // Object sizes
+        if (min_rel_objet_size < ui->min_rel_bbox_size->value() || max_rel_objet_size > ui->max_rel_bbox_size->value())
+        {
+          use_image = false;
+        }
+
+        // Num objects
+        if (num_objects < ui->min_num_objects->value() || num_objects > ui->max_num_objects->value())
+        {
+          use_image = false;
+        }
+      }
+
+      if (use_image)
+      {
+        image_file_names_.append(image_filename);
+      }
+    }
+  }
+  else
+  {
+    image_file_names_ = all_image_file_names;
+  }
+
   ui->image_slider->setMinimum(1);
   ui->image_slider->setMaximum(image_file_names_.size());
   ui->image_slider->setValue(1);
