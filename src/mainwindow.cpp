@@ -22,8 +22,6 @@ MainWindow::MainWindow(QWidget* parent)
   ui->image_view->setScene(scene_);
   ui->image_view->setInteractive(true);
 
-  folder_tree_model_.setOption(QFileSystemModel::DontWatchForChanges);
-
   // QFileIconProvider iconProvider;
   // folder_tree_model_.setIconProvider(&iconProvider);
   folder_tree_model_.setRootPath(root_path_);
