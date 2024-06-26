@@ -52,6 +52,7 @@ private:
   QShortcut move_to_train_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_Return), this};
   QShortcut move_to_val_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_V), this};
   QShortcut move_to_test_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_T), this};
+  QShortcut move_to_merge_shortcut_{QKeySequence(Qt::CTRL | Qt::Key_M), this};
 
   QProcess predict_process_{this};
 
@@ -78,6 +79,7 @@ private slots:
   void onMoveImageToTrain();
   void onMoveImageToVal();
   void onMoveImageToTest();
+  void onMoveImageToMerge();
 
   void onUpdateFiltering();
 

@@ -51,9 +51,6 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   connect(ui->folder_tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectFolder);
 
   connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
-  openFolder("/Users/jan/yolo_data/");
-
-  connect(ui->image_slider, &QSlider::valueChanged, this, &MainWindow::onLoadImage);
 
   connect(&prev_image_shortcut_, &QShortcut::activated, this, &MainWindow::onPrevImage);
   connect(&next_image_shortcut_, &QShortcut::activated, this, &MainWindow::onNextImage);
@@ -66,6 +63,8 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   connect(&move_to_train_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTrain);
   connect(&move_to_val_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToVal);
   connect(&move_to_test_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToTest);
+  connect(&move_to_merge_shortcut_, &QShortcut::activated, this, &MainWindow::onMoveImageToMerge);
+
   connect(ui->predict_button, &QPushButton::clicked, this, &MainWindow::onStartPrediction);
 
   connect(ui->min_num_objects, SIGNAL(valueChanged(int)), this, SLOT(onUpdateFiltering()));
@@ -76,6 +75,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   move_to_train_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
   move_to_val_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
   move_to_test_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
+  move_to_merge_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
 
   prev_image_shortcut_.setAutoRepeat(true);
   prev_image_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
@@ -214,6 +214,8 @@ void MainWindow::moveCurrentImageToFolder(const QString& folder)
 
   current_folder_.mkpath(rel_new_folder);
 
+  qDebug() << image_filename << " -> " << new_image_filename;
+
   // Move the image file
   current_folder_.rename(image_filename, new_image_filename);
 
@@ -269,6 +271,11 @@ void MainWindow::onMoveImageToVal()
 void MainWindow::onMoveImageToTest()
 {
   moveCurrentImageToFolder("test");
+}
+
+void MainWindow::onMoveImageToMerge()
+{
+  moveCurrentImageToFolder("merge");
 }
 
 void MainWindow::onStartPrediction(bool checked)
