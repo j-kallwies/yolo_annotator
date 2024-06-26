@@ -384,10 +384,21 @@ void MainWindow::openFolder(const QString& folder)
 
   ui->image_slider->setMinimum(1);
   ui->image_slider->setMaximum(image_file_names_.size());
-  ui->image_slider->setValue(1);
+
+  annotation_manager_->clear();
+  ui->image_view->scene()->clear();
+  ui->image_index_label->setText("");
 
   // Load the first image of this folder
-  onLoadImage(1);
+  if (ui->keep_image_index->isChecked() == false)
+  {
+    ui->image_slider->setValue(1);
+    onLoadImage(1);
+  }
+  else
+  {
+    onLoadImage(ui->image_slider->value());
+  }
 }
 
 QString MainWindow::getLabelFilename(const QString& image_filename)
