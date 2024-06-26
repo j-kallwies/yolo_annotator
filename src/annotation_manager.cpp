@@ -2,8 +2,9 @@
 
 #include <QFile>
 
-AnnotationManager::AnnotationManager(ImageView* image_view)
-    : image_view_(image_view)
+AnnotationManager::AnnotationManager(ImageView* image_view, const QStringList& label_names)
+    : image_view_(image_view),
+      label_names_(label_names)
 {
 }
 
@@ -25,7 +26,7 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
 
       if (fields.size() == 5)
       {
-        AnnotationBoundingBox* new_bbox = new AnnotationBoundingBox(image_size);
+        AnnotationBoundingBox* new_bbox = new AnnotationBoundingBox(image_size, label_names_);
 
         const float x_center = fields[1].toFloat() * image_size.width();
         const float y_center = fields[2].toFloat() * image_size.height();

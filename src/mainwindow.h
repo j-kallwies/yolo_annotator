@@ -21,11 +21,11 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow(QWidget* parent = 0);
+  MainWindow(const QString& root_path, QWidget* parent = 0);
   virtual ~MainWindow();
 
 private:
-  const QString root_path_{"/Users/jan/yolo_data/"};
+  const QString root_path_;
 
   QScopedPointer<Ui::MainWindow> ui;
 
@@ -85,4 +85,6 @@ private slots:
 
 private:
   static QString getLabelFilename(const QString& image_filename);
+
+  QStringList label_names_{"multicopter", "fixedwing", "helicopter", "bird"};
 };

@@ -1,10 +1,12 @@
 #include "annotationboundingbox.h"
 #include "label_colors.h"
 
+#include <QPainter>
 #include <QPen>
 
-AnnotationBoundingBox::AnnotationBoundingBox(const QSize& image_size)
-    : image_size_(image_size)
+AnnotationBoundingBox::AnnotationBoundingBox(const QSize& image_size, const QStringList& label_names)
+    : image_size_(image_size),
+      label_names_(label_names)
 {
   updateColors();
 
@@ -239,4 +241,33 @@ QString AnnotationBoundingBox::toString() const
 void AnnotationBoundingBox::setRect(const QRectF& r)
 {
   QGraphicsRectItem::setRect(r.intersected(QRectF(QPointF(0, 0), image_size_)));
+}
+
+QRectF AnnotationBoundingBox::boundingRect() const
+{
+  QRectF box_rect = QGraphicsRectItem::boundingRect();
+
+  QRectF text_rect;
+  if (label_names_.size() > label_id_)
+  {
+    text_rect = QFontMetrics(label_text_font_).boundingRect(label_names_.at(label_id_));
+    text_rect.translate(QPointF(this->rect().topLeft()));
+  }
+
+  return box_rect.united(text_rect);
+}
+
+void AnnotationBoundingBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+  QColor color = LabelColors::colorForLabelId(label_id_);
+  color.setAlphaF(0.7);
+  painter->setPen(color);
+  painter->setFont(label_text_font_);
+
+  if (label_names_.size() > label_id_)
+  {
+    painter->drawText(this->rect().topLeft(), label_names_.at(label_id_));
+  }
+
+  QGraphicsRectItem::paint(painter, option, widget);
 }

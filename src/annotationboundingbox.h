@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QBrush>
+#include <QFont>
 #include <QGraphicsRectItem>
 
 enum class BoundingBoxPart
@@ -19,7 +20,7 @@ enum class BoundingBoxPart
 class AnnotationBoundingBox : public QGraphicsRectItem
 {
 public:
-  AnnotationBoundingBox(const QSize& image_size);
+  AnnotationBoundingBox(const QSize& image_size, const QStringList& label_names);
 
   QPointF center() const;
   float width() const;
@@ -48,6 +49,9 @@ public:
 
   QString toString() const;
 
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+  QRectF boundingRect() const override;
+
 private:
   bool selected_{false};
   QBrush default_brush_;
@@ -55,6 +59,10 @@ private:
   int label_id_{-1};
 
   const QSize image_size_;
+
+  const QStringList& label_names_;
+
+  const QFont label_text_font_{"Arial", 24, 3};
 
   void updateColors();
 };

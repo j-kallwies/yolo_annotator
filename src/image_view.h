@@ -30,7 +30,7 @@ class ImageView : public QGraphicsView
 public:
   ImageView(QWidget* parent = nullptr);
 
-  void init(AnnotationManager* annotation_manager);
+  void init(AnnotationManager* annotation_manager, QStringList* label_names);
 
   void setImage(const QImage& image, const bool fit_view);
 
@@ -59,4 +59,6 @@ private:
   BoundingBoxPart edit_bbox_part_;
   QPointF edit_bbox_static_opposite_point_;
   QPointF edit_bbox_offset_;
+
+  QStringList* label_names_{nullptr};
 };

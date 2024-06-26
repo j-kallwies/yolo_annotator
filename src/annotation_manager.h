@@ -8,7 +8,7 @@ class ImageView;
 class AnnotationManager
 {
 public:
-  AnnotationManager(ImageView* image_view);
+  AnnotationManager(ImageView* image_view, const QStringList& label_names);
 
   void loadFromFile(const QString& label_filename, const QSize& image_size);
   void saveToFile(const QString& label_filename);
@@ -48,4 +48,6 @@ private:
   int active_label_{0};
 
   bool cleared_{false};
+
+  const QStringList& label_names_;
 };

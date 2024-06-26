@@ -9,15 +9,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget* parent)
+MainWindow::MainWindow(const QString& root_path, QWidget* parent)
     : QMainWindow(parent),
-      ui(new Ui::MainWindow)
+      ui(new Ui::MainWindow),
+      root_path_(root_path)
 {
   ui->setupUi(this);
 
-  annotation_manager_ = std::make_unique<AnnotationManager>(ui->image_view);
+  annotation_manager_ = std::make_unique<AnnotationManager>(ui->image_view, label_names_);
 
-  ui->image_view->init(annotation_manager_.get());
+  ui->image_view->init(annotation_manager_.get(), &label_names_);
 
   ui->image_view->setScene(scene_);
   ui->image_view->setInteractive(true);
