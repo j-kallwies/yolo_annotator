@@ -9,10 +9,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(const QString& root_path, QWidget* parent)
+MainWindow::MainWindow(const QString& root_path, const QStringList& label_names, QWidget* parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow),
-      root_path_(root_path)
+      root_path_(root_path),
+      label_names_(label_names)
 {
   ui->setupUi(this);
 

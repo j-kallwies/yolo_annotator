@@ -21,7 +21,7 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow(const QString& root_path, QWidget* parent = 0);
+  MainWindow(const QString& root_path, const QStringList& label_names, QWidget* parent = 0);
   virtual ~MainWindow();
 
 private:
@@ -86,5 +86,5 @@ private slots:
 private:
   static QString getLabelFilename(const QString& image_filename);
 
-  QStringList label_names_{"multicopter", "fixedwing", "helicopter", "bird"};
+  QStringList label_names_;
 };
