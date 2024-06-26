@@ -20,7 +20,7 @@ QColor LabelColors::colorForLabelId(const int label_id)
     return QColor(0.40 * 255, 0.761 * 255, 0.647 * 255);
 
   case 5:
-    return QColor(0.651 * 255, 0.337 * 255, 0.157 * 255);
+    return QColor(0.5 * 255, 0.5 * 255, 0.5 * 255);
 
   case 6:
     return QColor(0.969 * 255, 0.506 * 255, 0.749 * 255);
