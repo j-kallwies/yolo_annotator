@@ -13,6 +13,8 @@ public:
   void loadFromFile(const QString& label_filename, const QSize& image_size);
   void saveToFile(const QString& label_filename);
 
+  void setLabelOutputFilename(const QString& output_label_filename);
+
   void save();
 
   void clear();
@@ -41,7 +43,7 @@ private:
   QVector<AnnotationBoundingBox*> annotation_bounding_boxes_;
   ImageView* image_view_;
 
-  QString label_filename_;
+  QString output_label_filename_;
 
   std::optional<int> selected_bbox_id_;
 

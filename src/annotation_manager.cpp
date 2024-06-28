@@ -10,7 +10,9 @@ AnnotationManager::AnnotationManager(ImageView* image_view, const QStringList& l
 
 void AnnotationManager::loadFromFile(const QString& label_filename, const QSize& image_size)
 {
-  label_filename_ = label_filename;
+  qDebug() << "AnnotationManager::loadFromFile " << label_filename;
+
+  output_label_filename_ = "";
 
   this->clear();
 
@@ -52,6 +54,12 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
   this->cleared_ = false;
 }
 
+void AnnotationManager::setLabelOutputFilename(const QString& output_label_filename)
+{
+  output_label_filename_ = output_label_filename;
+  // qDebug() << "output_label_filename_=" << output_label_filename_;
+}
+
 void AnnotationManager::saveToFile(const QString& label_filename)
 {
   // Cancel saving in case of a cleared state!
@@ -75,7 +83,10 @@ void AnnotationManager::saveToFile(const QString& label_filename)
 
 void AnnotationManager::save()
 {
-  this->saveToFile(label_filename_);
+  if (output_label_filename_.size() > 0)
+  {
+    this->saveToFile(output_label_filename_);
+  }
 }
 
 void AnnotationManager::add(AnnotationBoundingBox* new_bbox)

@@ -38,7 +38,9 @@ private:
 
   const QStringList image_filename_filter_{"*.jpg", "*.jpeg", "*.png", "*.webp"};
 
-  QDir current_folder_;
+  QDir current_image_folder_;
+  QDir primary_annotations_folder_;
+  QList<QDir> secondary_annotations_folders_;
   QStringList image_file_names_;
 
   QShortcut prev_image_shortcut_{QKeySequence(Qt::Key_Left), this};
@@ -86,7 +88,10 @@ private slots:
   void onStartPrediction(bool checked);
 
 private:
-  static QString getLabelFilename(const QString& image_filename);
+  static QString imageFilenameToLabelFilename(const QString& image_filename);
+
+  QString getActiveImageFilename();
+  QString getLabelFilename(const QString& image_filename);
 
   QStringList label_names_;
 };
