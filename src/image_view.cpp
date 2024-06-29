@@ -142,7 +142,20 @@ bool ImageView::viewportEvent(QEvent* event)
 
   case QEvent::Wheel:
   {
+    QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
     // qDebug() << "QEvent::Wheel";
+
+    if (QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
+    {
+      const float zoom_speed = 0.05;
+      const float scale_factor = (wheelEvent->angleDelta().y() > 0) ? 1.0 + zoom_speed : 1.0 - zoom_speed;
+
+      current_total_scale_factor_ *= scale_factor;
+      scale(scale_factor, scale_factor);
+
+      return true;
+    }
+
     return QGraphicsView::viewportEvent(event);
 
     // Disable wheel events
