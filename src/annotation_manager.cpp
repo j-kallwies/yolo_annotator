@@ -69,6 +69,13 @@ void AnnotationManager::saveToFile(const QString& label_filename)
   }
 
   QFile file(label_filename);
+
+  // Do not create empty (useless) files
+  if (!file.exists() && this->annotation_bounding_boxes_.size() == 0)
+  {
+    return;
+  }
+
   if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     QTextStream stream(&file);
