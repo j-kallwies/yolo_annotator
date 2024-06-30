@@ -26,7 +26,7 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
       QString line = in.readLine();
       QStringList fields = line.split(" ");
 
-      if (fields.size() == 5)
+      if (fields.size() >= 5)
       {
         AnnotationBoundingBox* new_bbox = new AnnotationBoundingBox(image_size, label_names_);
 
