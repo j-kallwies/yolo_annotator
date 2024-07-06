@@ -112,7 +112,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
     ui->cnn_model->clear();
     QStringList pt_files = QDir(root_path_).entryList({"*.pt"}, QDir::Filter::Files, QDir::Name);
 
-    for (const auto pt_filename : pt_files)
+    for (const auto& pt_filename : pt_files)
     {
       ui->cnn_model->addItem(pt_filename);
     }
