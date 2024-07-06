@@ -43,6 +43,12 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   ui->folder_tree_view->hideColumn(2);
   ui->folder_tree_view->hideColumn(3);
 
+  ui->filter_by_label_combobox->clear();
+  for (const auto& label_name : label_names)
+  {
+    ui->filter_by_label_combobox->addItem(label_name);
+  }
+
   // Restore the previous state
   this->restoreGeometry(settings_.value("window/geometry").toByteArray());
   this->restoreState(settings_.value("window/state").toByteArray());
@@ -71,6 +77,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   connect(ui->max_num_objects, SIGNAL(valueChanged(int)), this, SLOT(onUpdateFiltering()));
   connect(ui->min_rel_bbox_size, SIGNAL(valueChanged(double)), this, SLOT(onUpdateFiltering()));
   connect(ui->max_rel_bbox_size, SIGNAL(valueChanged(double)), this, SLOT(onUpdateFiltering()));
+  connect(ui->filter_by_label_combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(onUpdateFiltering()));
 
   move_to_train_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
   move_to_val_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
@@ -402,6 +409,7 @@ void MainWindow::openFolder(const QString& folder)
       int num_objects = 0;
       float min_rel_objet_size = std::numeric_limits<float>::infinity();
       float max_rel_objet_size = 0.f;
+      QSet<int> label_ids;
 
       QFile file(current_image_folder_.absoluteFilePath(label_filename));
       if (file.open(QIODevice::ReadOnly))
@@ -414,7 +422,7 @@ void MainWindow::openFolder(const QString& folder)
 
           QStringList fields = line.split(" ");
 
-          if (fields.size() == 5)
+          if (fields.size() >= 5)
           {
             num_objects++;
 
@@ -423,6 +431,8 @@ void MainWindow::openFolder(const QString& folder)
 
             min_rel_objet_size = std::min(rel_box_width, std::min(rel_box_height, min_rel_objet_size));
             max_rel_objet_size = std::max(rel_box_width, std::max(rel_box_height, max_rel_objet_size));
+
+            label_ids.insert(fields[0].toInt());
           }
         }
 
@@ -440,6 +450,12 @@ void MainWindow::openFolder(const QString& folder)
 
         // Num objects
         if (num_objects < ui->min_num_objects->value() || num_objects > ui->max_num_objects->value())
+        {
+          use_image = false;
+        }
+
+        // Label
+        if (ui->filter_by_label->isChecked() && (label_ids.contains(ui->filter_by_label_combobox->currentIndex()) == false))
         {
           use_image = false;
         }
