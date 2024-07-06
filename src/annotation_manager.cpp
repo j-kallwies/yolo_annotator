@@ -10,8 +10,6 @@ AnnotationManager::AnnotationManager(ImageView* image_view, const QStringList& l
 
 void AnnotationManager::loadFromFile(const QString& label_filename, const QSize& image_size)
 {
-  qDebug() << "AnnotationManager::loadFromFile " << label_filename;
-
   output_label_filename_ = "";
 
   this->clear();
