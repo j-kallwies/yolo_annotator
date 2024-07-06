@@ -489,11 +489,9 @@ QString MainWindow::getLabelFilename(const QString& image_filename)
 {
   // Try primary labelfile
   const QString label_filename = imageFilenameToLabelFilename(image_filename);
-  // qDebug() << "label_filename=" << label_filename;
 
   if (QFile(primary_annotations_folder_.absoluteFilePath(label_filename)).exists())
   {
-    qDebug() << "Found annotation file in primary folder: " << primary_annotations_folder_.absoluteFilePath(label_filename);
     return primary_annotations_folder_.absoluteFilePath(label_filename);
   }
 
@@ -501,13 +499,11 @@ QString MainWindow::getLabelFilename(const QString& image_filename)
   {
     if (QFile(annotation_folder.absoluteFilePath(label_filename)).exists())
     {
-      qDebug() << "Found annotation file in secondary folder: " << annotation_folder.absoluteFilePath(label_filename);
       return annotation_folder.absoluteFilePath(label_filename);
     }
   }
 
   // Fallback: No annotation file is available
-  // qDebug() << "Could not find annotion file: " << label_filename;
   return "";
 }
 
