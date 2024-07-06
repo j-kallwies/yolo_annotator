@@ -46,10 +46,7 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
     file.close();
   }
 
-  if (this->annotation_bounding_boxes_.size() > 0)
-  {
-    select(0);
-  }
+  select(0);
 
   this->cleared_ = false;
 }
@@ -257,7 +254,10 @@ void AnnotationManager::removeSelectedBoundingBox()
   if (selected_bbox_id_)
   {
     this->remove(selected_bbox_id_.value());
+    selected_bbox_id_.reset();
   }
+
+  selectNext();
 }
 
 void AnnotationManager::activateLabel(const int label_id)

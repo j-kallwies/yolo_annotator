@@ -116,6 +116,8 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
     {
       ui->cnn_model->addItem(pt_filename);
     }
+
+    ui->cnn_model->setCurrentIndex(ui->cnn_model->count() - 1);
   }
 }
 
@@ -524,7 +526,12 @@ void MainWindow::loadImage(const QString& image_filename)
 
   // Load the annotations
   {
-    const QString output_label_filename = current_image_folder_.absoluteFilePath(imageFilenameToLabelFilename(image_filename));
+    QString output_label_filename;
+
+    if (ui->folder_mode->currentText() == "Annotation Mode")
+    {
+      output_label_filename = current_image_folder_.absoluteFilePath(imageFilenameToLabelFilename(image_filename));
+    }
 
     ui->annotation_filenames_label->setText(
         QString("📂 %1   ➡   📝 %2")
