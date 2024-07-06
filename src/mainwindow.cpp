@@ -458,7 +458,7 @@ void MainWindow::openFolder(const QString& folder)
   ui->image_slider->setMaximum(image_file_names_.size());
 
   annotation_manager_->clear();
-  ui->image_view->scene()->clear();
+  ui->image_view->clear();
   ui->image_index_label->setText("");
 
   // Load the first image of this folder

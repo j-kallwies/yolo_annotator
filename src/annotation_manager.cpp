@@ -117,13 +117,19 @@ void AnnotationManager::clear()
 
 void AnnotationManager::select(int bbox_index)
 {
-  annotation_bounding_boxes_[bbox_index]->select();
-  selected_bbox_id_ = bbox_index;
+  if (this->annotation_bounding_boxes_.size() > bbox_index)
+  {
+    annotation_bounding_boxes_[bbox_index]->select();
+    selected_bbox_id_ = bbox_index;
+  }
 }
 
 void AnnotationManager::unselect(int bbox_index)
 {
-  annotation_bounding_boxes_[bbox_index]->unselect();
+  if (this->annotation_bounding_boxes_.size() > bbox_index)
+  {
+    annotation_bounding_boxes_[bbox_index]->unselect();
+  }
 
   if (selected_bbox_id_ && selected_bbox_id_.value() == bbox_index)
   {
@@ -218,14 +224,20 @@ std::optional<std::pair<int, BoundingBoxPart>> AnnotationManager::getBoundingBox
 
 void AnnotationManager::removeLatest()
 {
-  image_view_->scene()->removeItem(annotation_bounding_boxes_.back());
-  annotation_bounding_boxes_.pop_back();
+  if (annotation_bounding_boxes_.size() > 0)
+  {
+    image_view_->scene()->removeItem(annotation_bounding_boxes_.back());
+    annotation_bounding_boxes_.pop_back();
+  }
 }
 
 void AnnotationManager::remove(int bbox_index)
 {
-  image_view_->scene()->removeItem(annotation_bounding_boxes_[bbox_index]);
-  annotation_bounding_boxes_.remove(bbox_index);
+  if (annotation_bounding_boxes_.size() > bbox_index)
+  {
+    image_view_->scene()->removeItem(annotation_bounding_boxes_[bbox_index]);
+    annotation_bounding_boxes_.remove(bbox_index);
+  }
 }
 
 AnnotationBoundingBox* AnnotationManager::getAnnotationBoundingBox(int bbox_index)
@@ -250,7 +262,7 @@ void AnnotationManager::removeSelectedBoundingBox()
 
 void AnnotationManager::activateLabel(const int label_id)
 {
-  if (selected_bbox_id_)
+  if (selected_bbox_id_ && annotation_bounding_boxes_.size() > *selected_bbox_id_)
   {
     annotation_bounding_boxes_[*selected_bbox_id_]->setLabelID(label_id);
   }

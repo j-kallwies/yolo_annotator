@@ -18,10 +18,18 @@ void ImageView::init(AnnotationManager* annotation_manager, QStringList* label_n
   label_names_ = label_names;
 }
 
-void ImageView::setImage(const QImage& image, const bool fit_view)
+void ImageView::clear()
 {
   scene()->clear();
+  image_item_ = nullptr;
+  v_line_item_ = nullptr;
+  h_line_item_ = nullptr;
+}
+
+void ImageView::setImage(const QImage& image, const bool fit_view)
+{
   annotation_manager_->clear();
+  this->clear();
 
   image_item_ = new QGraphicsPixmapItem();
   image_item_->setPixmap(QPixmap::fromImage(image));
@@ -214,6 +222,11 @@ bool ImageView::viewportEvent(QEvent* event)
 
 void ImageView::mousePressEvent(QMouseEvent* event)
 {
+  if (image_item_ == nullptr)
+  {
+    return;
+  }
+
   // qDebug() << "QEvent::mousePressEvent";
 
   const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());

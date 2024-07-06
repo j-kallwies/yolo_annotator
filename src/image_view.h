@@ -32,6 +32,8 @@ public:
 
   void init(AnnotationManager* annotation_manager, QStringList* label_names);
 
+  void clear();
+
   void setImage(const QImage& image, const bool fit_view);
 
   bool viewportEvent(QEvent* event) override;
@@ -50,7 +52,7 @@ private:
   TouchMode touch_mode_{TouchMode::None};
   std::optional<QPointF> current_start_point_;
 
-  QGraphicsPixmapItem* image_item_;
+  QGraphicsPixmapItem* image_item_{nullptr};
   QGraphicsLineItem* v_line_item_;
   QGraphicsLineItem* h_line_item_;
 
