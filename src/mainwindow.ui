@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>807</width>
-    <height>800</height>
+    <height>826</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,7 +134,45 @@
            </item>
           </layout>
          </widget>
-         <widget class="ImageView" name="image_view"/>
+         <widget class="QTabWidget" name="image_view_container">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>ImageView</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="ImageView" name="image_view"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+           <attribute name="title">
+            <string>Grid</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <widget class="QListView" name="image_grid_view">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ContiguousSelection</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_5">
+           <attribute name="title">
+            <string>Table</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QTableView" name="images_table_view"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
            <number>2</number>
@@ -193,7 +231,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_6">
+             <widget class="QGroupBox" name="filter_by_rel_bbox_size">
               <property name="title">
                <string>Bounding Box Size (rel.)</string>
               </property>
@@ -242,7 +280,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_7">
+             <widget class="QGroupBox" name="filter_by_num_objects">
               <property name="title">
                <string>Num. Objects</string>
               </property>
@@ -281,7 +319,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_8">
+             <widget class="QGroupBox" name="filter_by_image_size">
               <property name="title">
                <string>Image Size</string>
               </property>
@@ -327,21 +365,36 @@
                <item>
                 <widget class="QComboBox" name="filter_by_label_combobox"/>
                </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="filter_by_filename">
+              <property name="title">
+               <string>Filename</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_10">
                <item>
-                <spacer name="verticalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>43</height>
-                  </size>
-                 </property>
-                </spacer>
+                <widget class="QLineEdit" name="filter_by_filename_edit"/>
                </item>
               </layout>
              </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>43</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>

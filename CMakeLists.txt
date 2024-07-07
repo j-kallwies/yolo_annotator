@@ -23,6 +23,9 @@ set(SOURCE_FILES
     src/annotationboundingbox.cpp
     src/label_colors.cpp
     src/annotation_manager.cpp
+    src/image_list_model.cpp
+    src/image_list_model.cpp
+    src/image_sort_filter_proxy_model.cpp
 )
 
 set(HEADER_FILES
@@ -31,6 +34,9 @@ set(HEADER_FILES
     src/annotationboundingbox.h
     src/label_colors.h
     src/annotation_manager.h
+    src/image_list_model.h
+    src/image_list_model.h
+    src/image_sort_filter_proxy_model.h
 )
 
 add_project_meta(META_FILES_TO_INCLUDE)

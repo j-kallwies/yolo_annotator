@@ -10,6 +10,8 @@
 #include <QShortcut>
 
 #include "annotation_manager.h"
+#include "image_list_model.h"
+#include "image_sort_filter_proxy_model.h"
 
 namespace Ui
 {
@@ -36,12 +38,8 @@ private:
 
   QFileSystemModel folder_tree_model_;
 
-  const QStringList image_filename_filter_{"*.jpg", "*.jpeg", "*.png", "*.webp"};
-
-  QDir current_image_folder_;
-  QDir primary_annotations_folder_;
-  QList<QDir> secondary_annotations_folders_;
-  QStringList image_file_names_;
+  ImageListModel* image_list_model_;
+  ImageSortFilterProxy* image_sort_filter_proxy_model_;
 
   QShortcut prev_image_shortcut_{QKeySequence(Qt::Key_Left), this};
   QShortcut next_image_shortcut_{QKeySequence(Qt::Key_Right), this};
@@ -58,15 +56,15 @@ private:
 
   QProcess predict_process_{this};
 
-  void openFolder(const QString& folder);
-
-  void loadImage(const QString& image_filename);
+  void loadImage(const int image_idx);
 
   void closeEvent(QCloseEvent* event) override;
 
   void onSelectFolder(const QItemSelection& selected, const QItemSelection& deselected);
 
 private slots:
+  void onImageListModelReset();
+
   void onLoadImage(int idx);
   void onPrevImage();
   void onNextImage();
@@ -74,6 +72,8 @@ private slots:
   void onEditImage();
 
   void onRemoveImage();
+
+  void onFolderModeChanged(int folder_mode);
 
   void moveCurrentImageToFolder(const QString& folder);
 
@@ -88,10 +88,5 @@ private slots:
   void onStartPrediction(bool checked);
 
 private:
-  static QString imageFilenameToLabelFilename(const QString& image_filename);
-
-  QString getActiveImageFilename();
-  QString getLabelFilename(const QString& image_filename);
-
   QStringList label_names_;
 };
