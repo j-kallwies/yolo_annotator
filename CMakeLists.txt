@@ -11,15 +11,10 @@ include(QtCommon)
 
 # Basic information about project
 
-project(example VERSION 1.0)
+project(yolo_annotator VERSION 1.0)
 
 # Set PROJECT_VERSION_PATCH and PROJECT_VERSION_TWEAK to 0 if not present, needed by add_project_meta
 fix_project_version()
-
-# Set additional project information
-set(COMPANY "Example")
-set(COPYRIGHT "Copyright (c) 2014 Vincent Lee. All rights reserved.")
-set(IDENTIFIER "com.example.Example")
 
 set(SOURCE_FILES
     src/main.cpp
@@ -40,7 +35,7 @@ set(HEADER_FILES
 
 add_project_meta(META_FILES_TO_INCLUDE)
 
-set(RESOURCE_FILES example.qrc)
+set(RESOURCE_FILES yolo_annotator.qrc)
 
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
@@ -51,6 +46,7 @@ add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${HEADER_FILES}
     ${META_FILES_TO_INCLUDE}
     ${RESOURCE_FILES}
+    src/image_list_model.h src/image_list_model.cpp
 )
 
 set_target_properties(${PROJECT_NAME}
