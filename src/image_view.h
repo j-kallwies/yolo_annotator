@@ -44,6 +44,8 @@ public:
 
   void fitViewToImage();
 
+  void setEditingMode(const bool enabled);
+
 private:
   AnnotationManager* annotation_manager_{nullptr};
 
@@ -53,8 +55,8 @@ private:
   std::optional<QPointF> current_start_point_;
 
   QGraphicsPixmapItem* image_item_{nullptr};
-  QGraphicsLineItem* v_line_item_;
-  QGraphicsLineItem* h_line_item_;
+  QGraphicsLineItem* v_line_item_{nullptr};
+  QGraphicsLineItem* h_line_item_{nullptr};
 
   BoundingBoxEditMode bbox_edit_mode_{BoundingBoxEditMode::None};
   std::optional<int> edit_bbox_id_;
@@ -63,4 +65,6 @@ private:
   QPointF edit_bbox_offset_;
 
   QStringList* label_names_{nullptr};
+
+  bool editing_enabled_{true};
 };

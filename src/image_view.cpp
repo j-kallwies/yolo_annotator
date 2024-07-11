@@ -52,6 +52,12 @@ void ImageView::setImage(const QImage& image, const bool fit_view)
     h_line_item_->setPen(pen);
     h_line_item_->setLine(QLineF(QPointF(0, 0), QPointF(image.width(), 0)));
     scene()->addItem(h_line_item_);
+
+    if (!editing_enabled_)
+    {
+      v_line_item_->hide();
+      h_line_item_->hide();
+    }
   }
 
   scene()->setSceneRect(image_item_->boundingRect());
@@ -231,7 +237,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
 
   const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
 
-  if (event->button() == Qt::LeftButton && this->dragMode() != QGraphicsView::DragMode::ScrollHandDrag)
+  if (event->button() == Qt::LeftButton && this->dragMode() != QGraphicsView::DragMode::ScrollHandDrag && editing_enabled_)
   {
     if (bbox_edit_mode_ == BoundingBoxEditMode::None)
     {
@@ -331,92 +337,98 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
   // qDebug() << "mouseMoveEvent()";
   // qDebug() << "bbox_edit_mode_=" << int(bbox_edit_mode_);
 
-  const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
-
-  auto bbox_under_cursor = annotation_manager_->getBoundingBoxPartUnderCursor(cursor_position);
-
-  if (bbox_under_cursor)
+  if (editing_enabled_)
   {
-    switch (bbox_under_cursor->second)
+    const QPointF cursor_position = mapToScene(event->position().x(), event->position().y());
+
+    auto bbox_under_cursor = annotation_manager_->getBoundingBoxPartUnderCursor(cursor_position);
+
+    if (bbox_under_cursor)
     {
-    case BoundingBoxPart::CentralArea:
-      this->setCursor(QCursor(Qt::PointingHandCursor));
-      break;
+      switch (bbox_under_cursor->second)
+      {
+      case BoundingBoxPart::CentralArea:
+        this->setCursor(QCursor(Qt::PointingHandCursor));
+        break;
 
-    case BoundingBoxPart::EdgeLeft:
-    case BoundingBoxPart::EdgeRight:
-      this->setCursor(QCursor(Qt::SizeHorCursor));
-      break;
+      case BoundingBoxPart::EdgeLeft:
+      case BoundingBoxPart::EdgeRight:
+        this->setCursor(QCursor(Qt::SizeHorCursor));
+        break;
 
-    case BoundingBoxPart::EdgeTop:
-    case BoundingBoxPart::EdgeBottom:
-      this->setCursor(QCursor(Qt::SizeVerCursor));
-      break;
+      case BoundingBoxPart::EdgeTop:
+      case BoundingBoxPart::EdgeBottom:
+        this->setCursor(QCursor(Qt::SizeVerCursor));
+        break;
 
-    case BoundingBoxPart::CornerUpperLeft:
-    case BoundingBoxPart::CornerLowerRight:
-      this->setCursor(QCursor(Qt::SizeFDiagCursor));
-      break;
+      case BoundingBoxPart::CornerUpperLeft:
+      case BoundingBoxPart::CornerLowerRight:
+        this->setCursor(QCursor(Qt::SizeFDiagCursor));
+        break;
 
-    case BoundingBoxPart::CornerUpperRight:
-    case BoundingBoxPart::CornerLowerLeft:
-      this->setCursor(QCursor(Qt::SizeBDiagCursor));
-      break;
+      case BoundingBoxPart::CornerUpperRight:
+      case BoundingBoxPart::CornerLowerLeft:
+        this->setCursor(QCursor(Qt::SizeBDiagCursor));
+        break;
+      }
     }
-  }
-  else
-  {
-    this->setCursor(QCursor(Qt::CrossCursor));
-  }
-
-  if (v_line_item_ && h_line_item_ && scene()->items().size() > 0)
-  {
-    v_line_item_->setPos(cursor_position.x(), 0);
-    h_line_item_->setPos(0, cursor_position.y());
-  }
-
-  AnnotationBoundingBox* edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
-
-  switch (bbox_edit_mode_)
-  {
-  case BoundingBoxEditMode::New:
-    if (!current_start_point_)
+    else
     {
-      current_start_point_ = cursor_position;
+      this->setCursor(QCursor(Qt::CrossCursor));
     }
 
-    annotation_manager_->latest()->setCornerPoints(*current_start_point_, cursor_position);
-    break;
-
-  case BoundingBoxEditMode::DragFullBox:
-    edit_bbox->setCenter(cursor_position - edit_bbox_offset_);
-    this->setCursor(QCursor(Qt::SizeAllCursor));
-    break;
-
-  case BoundingBoxEditMode::DragEdge:
-    switch (edit_bbox_part_)
+    if (v_line_item_ && h_line_item_ && scene()->items().size() > 0)
     {
-    case BoundingBoxPart::EdgeLeft:
-      edit_bbox->setXMin(cursor_position.x());
+      v_line_item_->setPos(cursor_position.x(), 0);
+      h_line_item_->setPos(0, cursor_position.y());
+
+      v_line_item_->show();
+      h_line_item_->show();
+    }
+
+    AnnotationBoundingBox* edit_bbox = annotation_manager_->getAnnotationBoundingBox(*edit_bbox_id_);
+
+    switch (bbox_edit_mode_)
+    {
+    case BoundingBoxEditMode::New:
+      if (!current_start_point_)
+      {
+        current_start_point_ = cursor_position;
+      }
+
+      annotation_manager_->latest()->setCornerPoints(*current_start_point_, cursor_position);
       break;
 
-    case BoundingBoxPart::EdgeRight:
-      edit_bbox->setXMax(cursor_position.x());
+    case BoundingBoxEditMode::DragFullBox:
+      edit_bbox->setCenter(cursor_position - edit_bbox_offset_);
+      this->setCursor(QCursor(Qt::SizeAllCursor));
       break;
 
-    case BoundingBoxPart::EdgeTop:
-      edit_bbox->setYMin(cursor_position.y());
+    case BoundingBoxEditMode::DragEdge:
+      switch (edit_bbox_part_)
+      {
+      case BoundingBoxPart::EdgeLeft:
+        edit_bbox->setXMin(cursor_position.x());
+        break;
+
+      case BoundingBoxPart::EdgeRight:
+        edit_bbox->setXMax(cursor_position.x());
+        break;
+
+      case BoundingBoxPart::EdgeTop:
+        edit_bbox->setYMin(cursor_position.y());
+        break;
+
+      case BoundingBoxPart::EdgeBottom:
+        edit_bbox->setYMax(cursor_position.y());
+        break;
+      }
       break;
 
-    case BoundingBoxPart::EdgeBottom:
-      edit_bbox->setYMax(cursor_position.y());
+    case BoundingBoxEditMode::DragCorner:
+      edit_bbox->setCornerPoints(edit_bbox_static_opposite_point_, cursor_position);
       break;
     }
-    break;
-
-  case BoundingBoxEditMode::DragCorner:
-    edit_bbox->setCornerPoints(edit_bbox_static_opposite_point_, cursor_position);
-    break;
   }
 
   QGraphicsView::mouseMoveEvent(event);
@@ -433,60 +445,92 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageView::keyPressEvent(QKeyEvent* event)
 {
-  switch (event->key())
+  if (editing_enabled_)
   {
-  case Qt::Key_Backspace:
-  case Qt::Key_Delete:
-    annotation_manager_->removeSelectedBoundingBox();
-    edit_bbox_id_.reset();
-    break;
+    switch (event->key())
+    {
+    case Qt::Key_Backspace:
+    case Qt::Key_Delete:
+      annotation_manager_->removeSelectedBoundingBox();
+      edit_bbox_id_.reset();
+      break;
 
-  case Qt::Key_1:
-    annotation_manager_->activateLabel(0);
-    break;
+    case Qt::Key_1:
+      annotation_manager_->activateLabel(0);
+      break;
 
-  case Qt::Key_2:
-    annotation_manager_->activateLabel(1);
-    break;
+    case Qt::Key_2:
+      annotation_manager_->activateLabel(1);
+      break;
 
-  case Qt::Key_3:
-    annotation_manager_->activateLabel(2);
-    break;
+    case Qt::Key_3:
+      annotation_manager_->activateLabel(2);
+      break;
 
-  case Qt::Key_4:
-    annotation_manager_->activateLabel(3);
-    break;
+    case Qt::Key_4:
+      annotation_manager_->activateLabel(3);
+      break;
 
-  case Qt::Key_5:
-    annotation_manager_->activateLabel(4);
-    break;
+    case Qt::Key_5:
+      annotation_manager_->activateLabel(4);
+      break;
 
-  case Qt::Key_6:
-    annotation_manager_->activateLabel(5);
-    break;
+    case Qt::Key_6:
+      annotation_manager_->activateLabel(5);
+      break;
 
-  case Qt::Key_7:
-    annotation_manager_->activateLabel(6);
-    break;
+    case Qt::Key_7:
+      annotation_manager_->activateLabel(6);
+      break;
 
-  case Qt::Key_8:
-    annotation_manager_->activateLabel(7);
-    break;
+    case Qt::Key_8:
+      annotation_manager_->activateLabel(7);
+      break;
 
-  case Qt::Key_9:
-    annotation_manager_->activateLabel(8);
-    break;
+    case Qt::Key_9:
+      annotation_manager_->activateLabel(8);
+      break;
 
-  case Qt::Key_0:
-    annotation_manager_->activateLabel(9);
-    break;
+    case Qt::Key_0:
+      annotation_manager_->activateLabel(9);
+      break;
 
-  case Qt::Key_BracketLeft:
-    annotation_manager_->selectPrevious();
-    break;
+    case Qt::Key_BracketLeft:
+      annotation_manager_->selectPrevious();
+      break;
 
-  case Qt::Key_BracketRight:
-    annotation_manager_->selectNext();
-    break;
+    case Qt::Key_BracketRight:
+      annotation_manager_->selectNext();
+      break;
+    }
+  }
+}
+
+void ImageView::setEditingMode(const bool enabled)
+{
+  editing_enabled_ = enabled;
+
+  if (editing_enabled_)
+  {
+    if (v_line_item_)
+    {
+      v_line_item_->show();
+    }
+    if (h_line_item_)
+    {
+      h_line_item_->show();
+    }
+  }
+  else
+  {
+    bbox_edit_mode_ = BoundingBoxEditMode::None;
+    if (v_line_item_)
+    {
+      v_line_item_->hide();
+    }
+    if (h_line_item_)
+    {
+      h_line_item_->hide();
+    }
   }
 }
