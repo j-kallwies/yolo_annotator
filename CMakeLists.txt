@@ -52,7 +52,6 @@ add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
     ${HEADER_FILES}
     ${META_FILES_TO_INCLUDE}
     ${RESOURCE_FILES}
-    src/image_list_model.h src/image_list_model.cpp
 )
 
 set_target_properties(${PROJECT_NAME}

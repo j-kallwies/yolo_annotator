@@ -23,6 +23,8 @@ bool ImageSortFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex& so
       sourceModel()->data(sourceModel()->index(sourceRow, ImageListModel::Columns::MIN_REL_OBJECT_SIZE, sourceParent)).toFloat();
   const float max_rel_object_size =
       sourceModel()->data(sourceModel()->index(sourceRow, ImageListModel::Columns::MAX_REL_OBJECT_SIZE, sourceParent)).toFloat();
+  const QList<QVariant> label_ids =
+      sourceModel()->data(sourceModel()->index(sourceRow, ImageListModel::Columns::LABEL_IDS, sourceParent)).toList();
 
   bool use_image = true;
 
@@ -49,6 +51,12 @@ bool ImageSortFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex& so
   {
     use_image &= num_objects >= filter_by_num_objects_.value().first;
     use_image &= num_objects <= filter_by_num_objects_.value().second;
+  }
+
+  // Filter by labels
+  if (filter_by_label_id_)
+  {
+    use_image &= label_ids.contains(QVariant(filter_by_label_id_.value()));
   }
 
   return use_image;
@@ -91,6 +99,20 @@ void ImageSortFilterProxy::setFilterByNumObjects(const int& min_num_objects, con
   else
   {
     filter_by_num_objects_.reset();
+  }
+
+  this->invalidateRowsFilter();
+}
+
+void ImageSortFilterProxy::setFilterByLabelId(const int& label_id, const bool enabled)
+{
+  if (enabled)
+  {
+    filter_by_label_id_ = label_id;
+  }
+  else
+  {
+    filter_by_label_id_.reset();
   }
 
   this->invalidateRowsFilter();

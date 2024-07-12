@@ -224,6 +224,16 @@ QVariant ImageListModel::data(const QModelIndex& index, int role) const
 
     case Columns::MAX_REL_OBJECT_SIZE:
       return image_data_.at(index.row()).max_rel_objet_size;
+
+    case Columns::LABEL_IDS:
+    {
+      QList<QVariant> label_ids;
+      for (const auto& id : image_data_.at(index.row()).label_ids)
+      {
+        label_ids.push_back(id);
+      }
+      return label_ids;
+    }
     }
   }
 

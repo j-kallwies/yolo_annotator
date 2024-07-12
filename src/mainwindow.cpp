@@ -221,6 +221,10 @@ void MainWindow::onUpdateFiltering()
   // Num. objects
   image_sort_filter_proxy_model_->setFilterByNumObjects(
       ui->min_num_objects->value(), ui->max_num_objects->value(), ui->filter_by_num_objects->isChecked());
+
+  // Filter by label id
+  image_sort_filter_proxy_model_->setFilterByLabelId(ui->filter_by_label_combobox->currentIndex(),
+                                                     ui->filter_by_label->isChecked());
 }
 
 void MainWindow::onSelectFolder(const QItemSelection& selected, const QItemSelection& deselected)

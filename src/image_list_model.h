@@ -24,6 +24,7 @@ public:
     NUM_OBJECTS,
     MIN_REL_OBJECT_SIZE,
     MAX_REL_OBJECT_SIZE,
+    LABEL_IDS,
     COUNT
   };
 
