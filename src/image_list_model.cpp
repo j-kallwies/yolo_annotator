@@ -1,5 +1,6 @@
 #include <QCryptographicHash>
 #include <QDirIterator>
+#include <QElapsedTimer>
 #include <QImage>
 #include <QPainter>
 
@@ -21,6 +22,9 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
   qDebug() << "=================================================";
   qDebug() << "=================================================";
   qDebug() << "openFolder(" << folder << ")";
+
+  QElapsedTimer timer;
+  timer.start();
 
   // A "normal" folder
   // -> Load images from the folder itself
@@ -131,6 +135,8 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
 
     image_data_.push_back(new_elem);
   }
+
+  qDebug() << "openFolder took " << timer.elapsed() << "ms";
 
 
   this->endResetModel();
