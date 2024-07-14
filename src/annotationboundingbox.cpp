@@ -203,14 +203,14 @@ void AnnotationBoundingBox::select()
 {
   selected_ = true;
 
-  this->setBrush(selected_brush_);
+  this->updateColors();
 }
 
 void AnnotationBoundingBox::unselect()
 {
   selected_ = false;
 
-  this->setBrush(default_brush_);
+  this->updateColors();
 }
 
 void AnnotationBoundingBox::setLabelID(int new_label_id)
@@ -237,6 +237,7 @@ void AnnotationBoundingBox::updateColors()
 
   default_brush_.setStyle(Qt::NoBrush);
   selected_brush_.setStyle(Qt::SolidPattern);
+
   color.setAlpha(100);
   selected_brush_.setColor(color);
 
@@ -282,7 +283,14 @@ QRectF AnnotationBoundingBox::boundingRect() const
 void AnnotationBoundingBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
   QColor color = LabelColors::colorForLabelId(label_id_);
-  color.setAlphaF(0.7);
+  if (this->selected_)
+  {
+    color.setAlphaF(1.0);
+  }
+  else
+  {
+    color.setAlphaF(0.7);
+  }
   painter->setPen(color);
   painter->setFont(label_text_font_);
 
