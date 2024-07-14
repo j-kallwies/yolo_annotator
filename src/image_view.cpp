@@ -251,8 +251,10 @@ void ImageView::mousePressEvent(QMouseEvent* event)
 
         bbox_edit_mode_ = BoundingBoxEditMode::New;
 
-        annotation_manager_->add(new AnnotationBoundingBox(QSize(image_item_->pixmap().size()), *label_names_));
-        annotation_manager_->latest()->setRect(QRectF(cursor_position, QSizeF(0, 0)));
+        annotation_manager_->add(new AnnotationBoundingBox(QRectF(cursor_position, QSizeF(0, 0)),
+                                                           annotation_manager_->activeLabel(),
+                                                           QSize(image_item_->pixmap().size()),
+                                                           *label_names_));
 
         current_start_point_ = cursor_position;
       }

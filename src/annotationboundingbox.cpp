@@ -4,13 +4,35 @@
 #include <QPainter>
 #include <QPen>
 
-AnnotationBoundingBox::AnnotationBoundingBox(const QSize& image_size, const QStringList& label_names)
+AnnotationBoundingBox::AnnotationBoundingBox(const QRectF& rect,
+                                             const int label_id,
+                                             const QSize& image_size,
+                                             const QStringList& label_names)
     : image_size_(image_size),
       label_names_(label_names)
 {
+  this->setRect(rect);
+  this->setLabelID(label_id);
+
   updateColors();
 
   this->setZValue(100);
+}
+
+AnnotationBoundingBox::AnnotationBoundingBox(const QStringList& yolo_fields,
+                                             const QSize& image_size,
+                                             const QStringList& label_names)
+    : image_size_(image_size),
+      label_names_(label_names)
+{
+  const float x_center = yolo_fields[1].toFloat() * image_size.width();
+  const float y_center = yolo_fields[2].toFloat() * image_size.height();
+  const float box_width = yolo_fields[3].toFloat() * image_size.width();
+  const float box_height = yolo_fields[4].toFloat() * image_size.height();
+
+  this->setRect(QRectF(QPointF(x_center - box_width / 2.f, y_center - box_height / 2.f), QSizeF(box_width, box_height)));
+
+  this->setLabelID(yolo_fields[0].toInt());
 }
 
 QPointF AnnotationBoundingBox::center() const

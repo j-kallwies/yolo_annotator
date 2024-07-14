@@ -20,7 +20,8 @@ enum class BoundingBoxPart
 class AnnotationBoundingBox : public QGraphicsRectItem
 {
 public:
-  AnnotationBoundingBox(const QSize& image_size, const QStringList& label_names);
+  AnnotationBoundingBox(const QRectF& rect, const int label_id, const QSize& image_size, const QStringList& label_names);
+  AnnotationBoundingBox(const QStringList& yolo_fields, const QSize& image_size, const QStringList& label_names);
 
   QPointF center() const;
   float width() const;
