@@ -119,45 +119,6 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
     image_data_.push_back(new_elem);
   }
 
-  // image_file_names_.clear();
-  // if (ui->enable_image_filtering->isChecked())
-  // {
-  //   for (const QString& image_filename : all_image_file_names)
-  //   {
-  //     QString label_filename = getLabelFilename(image_filename);
-
-  //     // Image Filtering
-  //     bool use_image = true;
-  //     {
-  //       // Object sizes
-  //       if (min_rel_objet_size < ui->min_rel_bbox_size->value() || max_rel_objet_size > ui->max_rel_bbox_size->value())
-  //       {
-  //         use_image = false;
-  //       }
-
-  //       // Num objects
-  //       if (num_objects < ui->min_num_objects->value() || num_objects > ui->max_num_objects->value())
-  //       {
-  //         use_image = false;
-  //       }
-
-  //       // Label
-  //       if (ui->filter_by_label->isChecked() && (label_ids.contains(ui->filter_by_label_combobox->currentIndex()) == false))
-  //       {
-  //         use_image = false;
-  //       }
-  //     }
-
-  //     if (use_image)
-  //     {
-  //       image_file_names_.append(image_filename);
-  //     }
-  //   }
-  // }
-  // else
-  // {
-  //   image_file_names_ = all_image_file_names;
-  // }
 
   this->endResetModel();
 }
