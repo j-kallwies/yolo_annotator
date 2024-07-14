@@ -260,24 +260,49 @@ void MainWindow::onEditImage()
 
 void MainWindow::onRemoveImage()
 {
-  const QString image_filename =
-      image_list_model_->getFullImagePath(image_sort_filter_proxy_model_->mapRowToSource(ui->image_slider->value() - 1));
-  const QString label_filename = image_list_model_->getAnnotationOutputFilename(
-      image_sort_filter_proxy_model_->mapRowToSource(ui->image_slider->value() - 1));
+  auto removeImage = [this](const int row)
+  {
+    const QString image_filename = image_list_model_->getFullImagePath(image_sort_filter_proxy_model_->mapRowToSource(row));
+    const QString label_filename =
+        image_list_model_->getAnnotationOutputFilename(image_sort_filter_proxy_model_->mapRowToSource(row));
 
-  qDebug() << "Remove " << image_filename;
-  qDebug() << "Remove " << label_filename;
+    qDebug() << "Remove " << image_filename;
+    qDebug() << "Remove " << label_filename;
 
-  QFile(image_filename).moveToTrash();
-  QFile(label_filename).moveToTrash();
+    QFile(image_filename).moveToTrash();
+    QFile(label_filename).moveToTrash();
 
-  // Remove the image from the list
-  image_list_model_->removeImage(image_sort_filter_proxy_model_->mapRowToSource(ui->image_slider->value() - 1));
-  image_sort_filter_proxy_model_->removeRow(ui->image_slider->value() - 1);
+    // Remove the image from the list
+    image_list_model_->removeImage(image_sort_filter_proxy_model_->mapRowToSource(row));
+    image_sort_filter_proxy_model_->removeRow(row);
+  };
 
-  // "Reload" => Load next image
-  ui->image_slider->setMaximum(image_sort_filter_proxy_model_->rowCount());
-  onLoadImage(ui->image_slider->value());
+  // Image View: Remove the currently shown image
+  if (ui->image_view_container->currentIndex() == 0)
+  {
+    removeImage(ui->image_slider->value() - 1);
+
+    // "Reload" => Load next image
+    ui->image_slider->setMaximum(image_sort_filter_proxy_model_->rowCount());
+    onLoadImage(ui->image_slider->value());
+  }
+  // Grid View: Remove the currently shown image
+  else if (ui->image_view_container->currentIndex() == 1)
+  {
+    std::vector<int> rows_to_remove;
+
+    for (const auto& idx : ui->image_grid_view->selectionModel()->selectedIndexes())
+    {
+      rows_to_remove.push_back(idx.row());
+    }
+
+    for (auto it = rows_to_remove.rbegin(); it != rows_to_remove.rend(); it++)
+    {
+      removeImage(*it);
+    }
+
+    ui->image_grid_view->selectionModel()->clear();
+  }
 }
 
 void MainWindow::moveCurrentImageToFolder(const QString& folder)

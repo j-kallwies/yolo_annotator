@@ -1,11 +1,14 @@
 #include <QCryptographicHash>
 #include <QDirIterator>
 #include <QImage>
+#include <QPainter>
 
 #include "image_list_model.h"
+#include "label_colors.h"
 
-ImageListModel::ImageListModel(QObject* parent)
-    : QAbstractListModel{parent}
+ImageListModel::ImageListModel(const QDir& root_path, QObject* parent)
+    : QAbstractListModel{parent},
+      cache_db_(root_path)
 {
 }
 
@@ -111,7 +114,7 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
 
         if (fields.size() >= 5)
         {
-          new_elem.num_objects++;
+          new_elem.annotations.push_back(fields);
 
           const float rel_box_width = fields[3].toFloat();
           const float rel_box_height = fields[4].toFloat();
@@ -153,6 +156,43 @@ int ImageListModel::columnCount(const QModelIndex& parent) const
   return Columns::COUNT;
 }
 
+QImage ImageListModel::getPreviewImage(const int image_idx) const
+{
+  QImage preview_image;
+
+  // 1. Load the preview image itself
+  const auto image_result =
+      cache_db_.getPreviewImage(image_data_.at(image_idx).md5_hash.toHex(), image_data_.at(image_idx).filesize);
+
+  if (image_result)
+  {
+    preview_image = image_result.value();
+  }
+  else
+  {
+    preview_image = QImage(current_image_folder_.absoluteFilePath(image_data_.at(image_idx).image_filename))
+                        .scaled(128, 128, Qt::KeepAspectRatio, Qt::FastTransformation)
+                        .convertToFormat(QImage::Format_RGB888);
+
+    cache_db_.storePreviewImage(image_data_.at(image_idx).md5_hash.toHex(), image_data_.at(image_idx).filesize, preview_image);
+  }
+
+  // 2. Add current annotated bounding boxes as overlay
+  QPainter painter(&preview_image);
+
+  for (const QStringList& annotation_fields : image_data_.at(image_idx).annotations)
+  {
+    AnnotationBoundingBox bbox(annotation_fields, preview_image.size(), QStringList());
+
+    QPen pen;
+    pen.setColor(LabelColors::colorForLabelId(bbox.labelID()));
+    painter.setPen(pen);
+    painter.drawRect(bbox.rect());
+  }
+
+  return preview_image;
+}
+
 QVariant ImageListModel::data(const QModelIndex& index, int role) const
 {
   // qDebug() << "ImageListModel::data(" << index.row() << "; " << index.column() << ")";
@@ -188,7 +228,7 @@ QVariant ImageListModel::data(const QModelIndex& index, int role) const
     }
 
     case Columns::NUM_OBJECTS:
-      return image_data_.at(index.row()).num_objects;
+      return image_data_.at(index.row()).annotations.size();
 
     case Columns::MIN_REL_OBJECT_SIZE:
       return image_data_.at(index.row()).min_rel_objet_size;
@@ -220,9 +260,7 @@ QVariant ImageListModel::data(const QModelIndex& index, int role) const
     {
       // Thumbnail image with annotation overlays
     case Qt::DecorationRole:
-      // TODO: Add annotation overlays!
-      return QImage(current_image_folder_.absoluteFilePath(image_data_.at(index.row()).image_filename))
-          .scaled(128, 128, Qt::KeepAspectRatio, Qt::FastTransformation);
+      return this->getPreviewImage(index.row());
 
       // Raw image in full resolution (for annotation purposeses)
     case Qt::UserRole:

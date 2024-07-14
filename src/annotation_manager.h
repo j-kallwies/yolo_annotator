@@ -28,6 +28,8 @@ public:
   void selectNext();
 
   void activateLabel(const int label_id);
+  int activeLabel() const;
+
   void removeSelectedBoundingBox();
 
   AnnotationBoundingBox* latest();

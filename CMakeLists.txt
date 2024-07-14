@@ -26,6 +26,7 @@ set(SOURCE_FILES
     src/image_list_model.cpp
     src/image_list_model.cpp
     src/image_sort_filter_proxy_model.cpp
+    src/cache_db_interface.cpp
 )
 
 set(HEADER_FILES
@@ -37,6 +38,7 @@ set(HEADER_FILES
     src/image_list_model.h
     src/image_list_model.h
     src/image_sort_filter_proxy_model.h
+    src/cache_db_interface.h
 )
 
 add_project_meta(META_FILES_TO_INCLUDE)
@@ -44,6 +46,7 @@ add_project_meta(META_FILES_TO_INCLUDE)
 set(RESOURCE_FILES yolo_annotator.qrc)
 
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(SQLite3)
 
 qt_standard_project_setup()
 
@@ -62,7 +65,11 @@ set_target_properties(${PROJECT_NAME}
 
 target_precompile_headers(${PROJECT_NAME} INTERFACE QtWidgets.h)
 
-target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
+target_link_libraries(
+  ${PROJECT_NAME}
+  Qt6::Widgets
+  SQLite::SQLite3
+)
 
 install(
     TARGETS ${PROJECT_NAME}

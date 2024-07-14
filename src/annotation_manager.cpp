@@ -26,18 +26,16 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
 
       if (fields.size() >= 5)
       {
-        AnnotationBoundingBox* new_bbox = new AnnotationBoundingBox(image_size, label_names_);
-
         const float x_center = fields[1].toFloat() * image_size.width();
         const float y_center = fields[2].toFloat() * image_size.height();
         const float box_width = fields[3].toFloat() * image_size.width();
         const float box_height = fields[4].toFloat() * image_size.height();
 
-        new_bbox->setRect(
-            QRectF(QPointF(x_center - box_width / 2.f, y_center - box_height / 2.f), QSizeF(box_width, box_height)));
-        new_bbox->setLabelID(fields[0].toInt());
-
-        this->add(new_bbox);
+        this->add(new AnnotationBoundingBox(
+            QRectF(QPointF(x_center - box_width / 2.f, y_center - box_height / 2.f), QSizeF(box_width, box_height)),
+            fields[0].toInt(),
+            image_size,
+            label_names_));
       }
     }
 
@@ -340,4 +338,9 @@ void AnnotationManager::activateLabel(const int label_id)
   }
 
   active_label_ = label_id;
+}
+
+int AnnotationManager::activeLabel() const
+{
+  return active_label_;
 }
