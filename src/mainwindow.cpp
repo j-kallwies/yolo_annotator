@@ -14,7 +14,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
       ui(new Ui::MainWindow),
       root_path_(root_path),
       label_names_(label_names),
-      image_list_model_(new ImageListModel(this)),
+      image_list_model_(new ImageListModel(root_path_, this)),
       image_sort_filter_proxy_model_(new ImageSortFilterProxy(this))
 
 {

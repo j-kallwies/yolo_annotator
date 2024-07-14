@@ -6,6 +6,8 @@
 struct ImageData
 {
   QString image_filename;
+  QByteArray md5_hash;
+  int filesize{0};
   int num_objects{0};
   float min_rel_objet_size{std::numeric_limits<float>::infinity()};
   float max_rel_objet_size{0.f};
@@ -25,6 +27,8 @@ public:
     MIN_REL_OBJECT_SIZE,
     MAX_REL_OBJECT_SIZE,
     LABEL_IDS,
+    MD5_HASH,
+    FILESIZE,
     COUNT
   };
 

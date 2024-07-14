@@ -1,3 +1,4 @@
+#include <QCryptographicHash>
 #include <QDirIterator>
 #include <QImage>
 
@@ -86,6 +87,15 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
     ImageData new_elem;
     new_elem.image_filename = image_filename;
 
+    // Load image data
+    QFile image_file(current_image_folder_.absoluteFilePath(new_elem.image_filename));
+    new_elem.filesize = image_file.size();
+
+    // Hash the first 5kByte of image data
+    image_file.open(QIODevice::ReadOnly);
+    new_elem.md5_hash = QCryptographicHash::hash(image_file.read(1024 * 5), QCryptographicHash::Algorithm::Md5);
+
+    // Load annotation data
     const QString label_filename = getLabelFilename(image_filename);
 
     QFile file(current_image_folder_.absoluteFilePath(label_filename));
@@ -195,6 +205,12 @@ QVariant ImageListModel::data(const QModelIndex& index, int role) const
       }
       return label_ids;
     }
+
+    case Columns::MD5_HASH:
+      return image_data_.at(index.row()).md5_hash.toHex();
+
+    case Columns::FILESIZE:
+      return image_data_.at(index.row()).filesize;
     }
   }
 
@@ -243,6 +259,12 @@ QVariant ImageListModel::headerData(int section, Qt::Orientation orientation, in
 
     case MAX_REL_OBJECT_SIZE:
       return "Max. rel. object size";
+
+    case Columns::MD5_HASH:
+      return "MD5 Hash";
+
+    case Columns::FILESIZE:
+      return "Filesize";
     }
   }
 
