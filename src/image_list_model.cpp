@@ -260,6 +260,9 @@ QVariant ImageListModel::headerData(int section, Qt::Orientation orientation, in
     case MAX_REL_OBJECT_SIZE:
       return "Max. rel. object size";
 
+    case LABEL_IDS:
+      return "Label IDs";
+
     case Columns::MD5_HASH:
       return "MD5 Hash";
 
