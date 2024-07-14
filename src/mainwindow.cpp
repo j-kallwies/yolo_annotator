@@ -55,7 +55,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   image_sort_filter_proxy_model_->setSourceModel(image_list_model_);
 
   ui->image_grid_view->setResizeMode(QListView::Adjust);
-  ui->image_grid_view->setUniformItemSizes(true);
+  // ui->image_grid_view->setUniformItemSizes(true);
   ui->image_grid_view->setViewMode(QListView::ViewMode::IconMode);
   ui->image_grid_view->setModel(image_sort_filter_proxy_model_);
 
