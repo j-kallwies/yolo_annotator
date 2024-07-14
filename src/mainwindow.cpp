@@ -204,9 +204,6 @@ void MainWindow::onLoadImage(int image_id)
 
   const QString image_filename = image_list_model_->getImageFilename(
       image_sort_filter_proxy_model_->mapToSource(image_sort_filter_proxy_model_->index(image_id - 1, 0)).row());
-
-  ui->image_index_label->setText(
-      QString("Image %1 / %2: %3").arg(image_id).arg(image_sort_filter_proxy_model_->rowCount()).arg(image_filename));
 }
 
 void MainWindow::onUpdateFiltering()
@@ -427,6 +424,15 @@ void MainWindow::loadImage(const int image_idx)
   {
     ui->image_view->setImage(image, ui->fit_view_button->isChecked());
   }
+
+  const QString image_filename = image_list_model_->getImageFilename(image_sort_filter_proxy_model_->mapRowToSource(image_idx));
+
+  ui->image_index_label->setText(QString("Image %1 / %2: %3 (%4 x %5 px)")
+                                     .arg(image_idx + 1)
+                                     .arg(image_sort_filter_proxy_model_->rowCount())
+                                     .arg(image_filename) // QDir(root_path_).relativeFilePath(
+                                     .arg(image.width())
+                                     .arg(image.height()));
 
   // Load the annotations
   {
