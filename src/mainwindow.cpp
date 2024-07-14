@@ -57,13 +57,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   ui->image_grid_view->setResizeMode(QListView::Adjust);
   ui->image_grid_view->setUniformItemSizes(true);
   ui->image_grid_view->setViewMode(QListView::ViewMode::IconMode);
-  // ui->image_grid_view->setIconSize(QSize(64, 64));
-  // ui->image_grid_view->setWordWrap(true);
-  // ui->image_grid_view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-  // ui->image_grid_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  // ui->image_grid_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   ui->image_grid_view->setModel(image_sort_filter_proxy_model_);
-  // ui->image_grid_view->showNormal();
 
   ui->images_table_view->setModel(image_sort_filter_proxy_model_);
   ui->images_table_view->horizontalHeader()->show();
