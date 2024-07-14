@@ -434,6 +434,14 @@ void MainWindow::loadImage(const int image_idx)
                                                 .arg(QDir(root_path_).relativeFilePath(input_label_filename),
                                                      QDir(root_path_).relativeFilePath(output_label_filename)));
 
+    if (ui->filter_by_label->isChecked())
+    {
+      annotation_manager_->prefered_label_id_ = ui->filter_by_label_combobox->currentIndex();
+    }
+    else
+    {
+      annotation_manager_->prefered_label_id_.reset();
+    }
     annotation_manager_->loadFromFile(input_label_filename, image.size());
     annotation_manager_->setLabelOutputFilename(output_label_filename);
   }

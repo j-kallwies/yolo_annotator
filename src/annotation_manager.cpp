@@ -44,7 +44,30 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
     file.close();
   }
 
-  select(0);
+  // Select the first bounding box
+  {
+    this->unselect();
+
+    bool selected = false;
+
+    if (prefered_label_id_)
+    {
+      for (int i = 0; i < annotation_bounding_boxes_.size(); i++)
+      {
+        if (annotation_bounding_boxes_.at(i)->labelID() == prefered_label_id_.value())
+        {
+          select(i);
+          selected = true;
+          break;
+        }
+      }
+    }
+
+    if (!selected)
+    {
+      select(0);
+    }
+  }
 
   this->cleared_ = false;
 }
@@ -159,8 +182,40 @@ void AnnotationManager::selectNext()
   // If a bounding box is selected, move on to the next one
   if (selected_bbox_id_)
   {
-    int next_bbox_id = *selected_bbox_id_ + 1;
+    int next_bbox_id = -1;
 
+    if (prefered_label_id_)
+    {
+      int num_bboxes_checked = 0;
+      for (int i = selected_bbox_id_.value() + 1;; i++)
+      {
+        if (i >= annotation_bounding_boxes_.size())
+        {
+          i = 0;
+        }
+
+        if (annotation_bounding_boxes_.at(i)->labelID() == prefered_label_id_.value())
+        {
+          next_bbox_id = i;
+          break;
+        }
+
+        num_bboxes_checked++;
+
+        if (num_bboxes_checked >= annotation_bounding_boxes_.size())
+        {
+          break;
+        }
+      }
+    }
+
+    // No prefered label found => just use the next one!
+    if (next_bbox_id == -1)
+    {
+      next_bbox_id = *selected_bbox_id_ + 1;
+    }
+
+    // Rotate at end of the indices
     if (next_bbox_id >= this->annotation_bounding_boxes_.size())
     {
       next_bbox_id = 0;
@@ -169,10 +224,29 @@ void AnnotationManager::selectNext()
     this->unselect(*selected_bbox_id_);
     this->select(next_bbox_id);
   }
-  // If no bounding box is selected, select the first one
+  // If no bounding box is selected, select the first relevant one
   else if (annotation_bounding_boxes_.size() > 0)
   {
-    this->select(0);
+    int next_bbox_id = -1;
+
+    if (prefered_label_id_)
+    {
+      for (int i = 0; i < annotation_bounding_boxes_.size(); i++)
+      {
+        if (annotation_bounding_boxes_.at(i)->labelID() == prefered_label_id_.value())
+        {
+          next_bbox_id = i;
+          break;
+        }
+      }
+    }
+
+    if (next_bbox_id == -1)
+    {
+      next_bbox_id = 0;
+    }
+
+    this->select(next_bbox_id);
   }
 }
 

@@ -39,6 +39,8 @@ public:
   void removeLatest();
   void remove(int bbox_index);
 
+  std::optional<int> prefered_label_id_;
+
 private:
   QVector<AnnotationBoundingBox*> annotation_bounding_boxes_;
   ImageView* image_view_;
