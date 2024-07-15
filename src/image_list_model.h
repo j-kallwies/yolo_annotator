@@ -46,6 +46,8 @@ public:
 
   void openFolder(const QString& folder, const Mode& folder_mode);
 
+  void setFolderMode(const Mode& folder_mode);
+
   void removeImage(const int image_idx);
 
   int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -65,7 +67,10 @@ public:
 
   QDir& currentImageFolder();
 
+  Mode currentFolderMode();
+
 private:
+  QString opened_folder_;
   QDir current_image_folder_;
   QDir primary_annotations_folder_;
   QList<QDir> secondary_annotations_folders_;

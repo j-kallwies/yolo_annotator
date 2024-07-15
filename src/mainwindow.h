@@ -56,6 +56,8 @@ private:
 
   QProcess predict_process_{this};
 
+  ImageListModel::Mode selectedFolderMode() const;
+
   void loadImage(const int image_idx);
 
   void closeEvent(QCloseEvent* event) override;
@@ -73,7 +75,7 @@ private slots:
 
   void onRemoveImage();
 
-  void onFolderModeChanged(int folder_mode);
+  void onFolderModeChanged();
 
   void moveCurrentImageToFolder(const QString& folder);
 

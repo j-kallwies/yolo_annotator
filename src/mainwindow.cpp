@@ -99,7 +99,20 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
 
   connect(this->image_list_model_, SIGNAL(modelReset()), this, SLOT(onImageListModelReset()));
 
-  connect(ui->folder_mode, SIGNAL(currentIndexChanged(int)), this, SLOT(onFolderModeChanged(int)));
+  connect(ui->annotation_mode_button,
+          &QPushButton::toggled,
+          [this]()
+          {
+            ui->review_mode_button->setChecked(!ui->annotation_mode_button->isChecked());
+            this->onFolderModeChanged();
+          });
+  connect(ui->review_mode_button,
+          &QPushButton::toggled,
+          [this]()
+          {
+            ui->annotation_mode_button->setChecked(!ui->review_mode_button->isChecked());
+            this->onFolderModeChanged();
+          });
 
   move_to_train_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
   move_to_val_shortcut_.setContext(Qt::ShortcutContext::ApplicationShortcut);
@@ -175,19 +188,28 @@ void MainWindow::onImageListModelReset()
   }
 }
 
-void MainWindow::onFolderModeChanged(int folder_mode)
+ImageListModel::Mode MainWindow::selectedFolderMode() const
 {
-  switch (folder_mode)
+  if (ui->annotation_mode_button->isChecked())
   {
-  case ImageListModel::Mode::ANNOTATION:
-    this->ui->image_view->setEditingMode(true);
-    break;
-
-  case ImageListModel::Mode::REVIEW:
-  default:
-    this->ui->image_view->setEditingMode(false);
-    break;
+    return ImageListModel::Mode::ANNOTATION;
   }
+  else
+  {
+    return ImageListModel::Mode::REVIEW;
+  }
+}
+
+void MainWindow::onFolderModeChanged()
+{
+  const ImageListModel::Mode new_folder_mode = selectedFolderMode();
+
+  if (new_folder_mode != image_list_model_->currentFolderMode())
+  {
+    image_list_model_->setFolderMode(new_folder_mode);
+  }
+
+  this->ui->image_view->setEditingMode(ui->annotation_mode_button->isChecked());
 }
 
 void MainWindow::onLoadImage(int image_id)
@@ -223,8 +245,7 @@ void MainWindow::onSelectFolder(const QItemSelection& selected, const QItemSelec
   if (selected.size() == 1)
   {
     const auto selected_index = selected.at(0).indexes().at(0);
-    image_list_model_->openFolder(folder_tree_model_.filePath(selected_index),
-                                  ImageListModel::Mode(ui->folder_mode->currentIndex()));
+    image_list_model_->openFolder(folder_tree_model_.filePath(selected_index), selectedFolderMode());
   }
 }
 
@@ -467,7 +488,8 @@ void MainWindow::loadImage(const int image_idx)
     {
       annotation_manager_->prefered_label_id_.reset();
     }
-    annotation_manager_->loadFromFile(input_label_filename, image.size());
+    annotation_manager_->loadFromFile(
+        input_label_filename, image.size(), selectedFolderMode() == ImageListModel::Mode::ANNOTATION);
     annotation_manager_->setLabelOutputFilename(output_label_filename);
   }
 }

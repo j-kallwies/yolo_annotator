@@ -16,6 +16,7 @@ ImageListModel::ImageListModel(const QDir& root_path, QObject* parent)
 void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
 {
   folder_mode_ = folder_mode;
+  opened_folder_ = folder;
 
   this->beginResetModel();
 
@@ -140,6 +141,11 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
 
 
   this->endResetModel();
+}
+
+void ImageListModel::setFolderMode(const Mode& folder_mode)
+{
+  openFolder(opened_folder_, folder_mode);
 }
 
 void ImageListModel::removeImage(const int image_idx)
@@ -375,4 +381,9 @@ QString ImageListModel::getLabelFilename(const QString& image_filename) const
 QDir& ImageListModel::currentImageFolder()
 {
   return current_image_folder_;
+}
+
+ImageListModel::Mode ImageListModel::currentFolderMode()
+{
+  return folder_mode_;
 }
