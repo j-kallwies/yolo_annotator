@@ -101,6 +101,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
 
   connect(ui->annotation_mode_button,
           &QPushButton::toggled,
+          this,
           [this]()
           {
             ui->review_mode_button->setChecked(!ui->annotation_mode_button->isChecked());
@@ -108,6 +109,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
           });
   connect(ui->review_mode_button,
           &QPushButton::toggled,
+          this,
           [this]()
           {
             ui->annotation_mode_button->setChecked(!ui->review_mode_button->isChecked());
@@ -131,6 +133,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
 
   connect(ui->fit_view_button,
           &QPushButton::clicked,
+          this,
           [this](const bool checked)
           {
             if (checked)
@@ -141,6 +144,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
 
   connect(&predict_process_,
           &QProcess::readyRead,
+          this,
           [this]()
           {
             if (predict_process_.canReadLine())
@@ -151,7 +155,7 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
             }
           });
 
-  connect(&predict_process_, &QProcess::terminate, [this]() { qDebug() << "YOLO terminated."; });
+  connect(&predict_process_, &QProcess::terminate, this, [this]() { qDebug() << "YOLO terminated."; });
 
   // Load CNN weight files
   {
