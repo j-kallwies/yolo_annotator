@@ -139,7 +139,6 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
 
   qDebug() << "openFolder took " << timer.elapsed() << "ms";
 
-
   this->endResetModel();
 }
 

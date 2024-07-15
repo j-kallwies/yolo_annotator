@@ -217,9 +217,6 @@ void MainWindow::onLoadImage(int image_id)
   annotation_manager_->save();
 
   loadImage(image_id - 1);
-
-  const QString image_filename = image_list_model_->getImageFilename(
-      image_sort_filter_proxy_model_->mapToSource(image_sort_filter_proxy_model_->index(image_id - 1, 0)).row());
 }
 
 void MainWindow::onUpdateFiltering()
