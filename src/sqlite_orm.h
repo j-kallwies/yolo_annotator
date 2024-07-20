@@ -1,5 +1,8 @@
 #pragma once
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #if defined(_MSC_VER)
 __pragma(push_macro("min"))
 #undef min
@@ -19503,3 +19506,5 @@ namespace sqlite_orm {
 __pragma(pop_macro("max"))
 __pragma(pop_macro("min"))
 #endif  // defined(_MSC_VER)
+
+#pragma clang diagnostic pop
