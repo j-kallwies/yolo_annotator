@@ -1,16 +1,33 @@
 #pragma once
 
+#include <QAbstractListModel>
+
 #include "annotationboundingbox.h"
 #include "image_view.h"
 
 class ImageView;
 
-class AnnotationManager
+class AnnotationManager : public QAbstractListModel
 {
 public:
+  enum Columns
+  {
+    LABEL_ID,
+    WIDTH,
+    HEIGHT,
+    COUNT
+  };
+
   AnnotationManager(ImageView* image_view, const QStringList& label_names);
 
-  void loadFromFile(const QString& label_filename, const QSize& image_size);
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const;
+
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+  void loadFromFile(const QString& label_filename, const QSize& image_size, const bool auto_select_first_bbox);
   void saveToFile(const QString& label_filename);
 
   void setLabelOutputFilename(const QString& output_label_filename);

@@ -8,11 +8,72 @@ AnnotationManager::AnnotationManager(ImageView* image_view, const QStringList& l
 {
 }
 
-void AnnotationManager::loadFromFile(const QString& label_filename, const QSize& image_size)
+int AnnotationManager::rowCount(const QModelIndex& parent) const
+{
+  return annotation_bounding_boxes_.size();
+}
+
+int AnnotationManager::columnCount(const QModelIndex& parent) const
+{
+  return Columns::COUNT;
+}
+
+QVariant AnnotationManager::data(const QModelIndex& index, int role) const
+{
+  if (!index.isValid())
+  {
+    return QVariant();
+  }
+
+  if (role == Qt::DisplayRole)
+  {
+    switch (index.column())
+    {
+    case Columns::LABEL_ID:
+      return label_names_.at(annotation_bounding_boxes_.at(index.row())->labelID());
+
+    case Columns::WIDTH:
+      return std::round(annotation_bounding_boxes_.at(index.row())->rect().width());
+
+    case Columns::HEIGHT:
+      return std::round(annotation_bounding_boxes_.at(index.row())->rect().height());
+    }
+  }
+
+  // Fallback
+  return {};
+}
+
+QVariant AnnotationManager::headerData(int section, Qt::Orientation orientation, int role) const
+{
+  if (orientation == Qt::Orientation::Horizontal && role == Qt::DisplayRole)
+  {
+    switch (section)
+    {
+    case Columns::LABEL_ID:
+      return "Label";
+
+    case Columns::WIDTH:
+      return "Width";
+
+    case Columns::HEIGHT:
+      return "Height";
+    }
+  }
+
+  // Fallback
+  return QAbstractListModel::headerData(section, orientation, role);
+}
+
+void AnnotationManager::loadFromFile(const QString& label_filename, const QSize& image_size, const bool auto_select_first_bbox)
 {
   output_label_filename_ = "";
 
   this->clear();
+
+  this->beginResetModel();
+
+  bool annotations_updated = false;
 
   QFile file(label_filename);
   if (file.open(QIODevice::ReadOnly))
@@ -22,7 +83,15 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
     while (!in.atEnd())
     {
       QString line = in.readLine();
+
       QStringList fields = line.split(" ");
+
+      if (!std::isfinite(fields[1].toFloat()) || !std::isfinite(fields[2].toFloat()) || !std::isfinite(fields[3].toFloat()))
+      {
+        qDebug() << "Found nan in " << label_filename;
+        annotations_updated = true;
+        std::terminate();
+      }
 
       if (fields.size() >= 5)
       {
@@ -34,6 +103,7 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
   }
 
   // Select the first bounding box
+  if (auto_select_first_bbox)
   {
     this->unselect();
 
@@ -59,6 +129,13 @@ void AnnotationManager::loadFromFile(const QString& label_filename, const QSize&
   }
 
   this->cleared_ = false;
+
+  this->endResetModel();
+
+  // if (annotations_updated)
+  // {
+  //   this->save();
+  // }
 }
 
 void AnnotationManager::setLabelOutputFilename(const QString& output_label_filename)

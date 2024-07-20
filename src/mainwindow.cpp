@@ -63,6 +63,8 @@ MainWindow::MainWindow(const QString& root_path, const QStringList& label_names,
   ui->images_table_view->horizontalHeader()->show();
   ui->images_table_view->verticalHeader()->show();
 
+  ui->annotations_view->setModel(annotation_manager_.get());
+
   // Restore the previous state
   this->restoreGeometry(settings_.value("window/geometry").toByteArray());
   this->restoreState(settings_.value("window/state").toByteArray());

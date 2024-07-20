@@ -25,6 +25,16 @@ AnnotationBoundingBox::AnnotationBoundingBox(const QStringList& yolo_fields,
     : image_size_(image_size),
       label_names_(label_names)
 {
+  if (!std::isfinite(yolo_fields[1].toFloat()) || !std::isfinite(yolo_fields[2].toFloat()) ||
+      !std::isfinite(yolo_fields[3].toFloat()) || !std::isfinite(yolo_fields[4].toFloat()))
+  {
+    qDebug() << "Found invalid bounding box!";
+
+    qDebug() << yolo_fields;
+
+    std::terminate();
+  }
+
   const float x_center = yolo_fields[1].toFloat() * image_size.width();
   const float y_center = yolo_fields[2].toFloat() * image_size.height();
   const float box_width = yolo_fields[3].toFloat() * image_size.width();

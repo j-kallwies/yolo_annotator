@@ -117,6 +117,11 @@ void ImageListModel::openFolder(const QString& folder, const Mode& folder_mode)
 
         QStringList fields = line.split(" ");
 
+        if (!std::isfinite(fields[1].toFloat()) || !std::isfinite(fields[2].toFloat()) || !std::isfinite(fields[3].toFloat()))
+        {
+          qDebug() << "Found nan in " << label_filename;
+        }
+
         if (fields.size() >= 5)
         {
           new_elem.annotations.push_back(fields);
