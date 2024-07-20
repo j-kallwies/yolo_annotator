@@ -1,6 +1,6 @@
 #include <QDebug>
 #include <QElapsedTimer>
-#include <QImage>
+#include <QtGui/QImage>
 #include <QString>
 
 #include "cache_db_interface.h"

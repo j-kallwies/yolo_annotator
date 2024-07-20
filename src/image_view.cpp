@@ -1,5 +1,5 @@
-#include <QGraphicsRectItem>
-#include <QMouseEvent>
+#include <QtWidgets/QGraphicsRectItem>
+#include <QtGUI/QMouseEvent>
 #include <QPointF>
 
 #include "image_view.h"

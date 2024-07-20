@@ -2,7 +2,7 @@
 
 #include <QAbstractItemModel>
 #include <QDir>
-#include <QImage>
+#include <QtGui/QImage>
 
 #include "annotationboundingbox.h"
 #include "cache_db_interface.h"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QEvent>
-#include <QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 
 #include "annotation_manager.h"
 

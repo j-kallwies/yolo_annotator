@@ -1,0 +1,51 @@
+load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library", "qt_resource", "qt_resource_via_qrc", "qt_ui_library")
+
+qt_ui_library(
+    name = "annotator_window_ui",
+    ui = "mainwindow.ui",
+    deps = [
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "annotator_window",
+    srcs = [
+        "src/mainwindow.cpp",
+        "src/annotationboundingbox.cpp",
+        "src/annotation_manager.cpp",
+        "src/image_view.cpp",
+        "src/image_list_model.cpp",
+        "src/cache_db_interface.cpp",
+        "src/image_sort_filter_proxy_model.cpp",
+        "src/label_colors.cpp",
+    ],
+    hdrs = [
+        "src/mainwindow.h",
+        "src/annotationboundingbox.h",
+        "src/annotation_manager.h",
+        "src/image_view.h",
+        "src/image_list_model.h",
+        "src/cache_db_interface.h",
+        "src/sqlite_orm.h",
+        "src/image_sort_filter_proxy_model.h",
+        "src/label_colors.h",
+    ],
+    deps = [
+        ":annotator_window_ui",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_cc_binary(
+    name = "yolo_annotator",
+    srcs = ["src/main.cpp"],
+    # hdrs = glob(["src/*.h*"]),
+    deps = [
+        ":annotator_window",
+        "@rules_qt//:qt_core",
+        "@rules_qt//:qt_widgets",
+        "@rules_qt//:qt_gui",
+        "@com_github_rockwotj_sqlite_bazel//:sqlite3",
+    ],
+)

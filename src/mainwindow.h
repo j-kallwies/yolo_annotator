@@ -1,13 +1,14 @@
 #pragma once
 
-#include <QFileSystemModel>
-#include <QGraphicsScene>
+#include <QtGui/QFileSystemModel>
+#include <QtWidgets/QGraphicsScene>
 #include <QItemSelection>
-#include <QMainWindow>
-#include <QProcess>
-#include <QScopedPointer>
-#include <QSettings>
-#include <QShortcut>
+#include <QtWidgets/QMainWindow>
+#include <QtCore/QProcess>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QSettings>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/qshortcut.h>
 
 #include "annotation_manager.h"
 #include "image_list_model.h"

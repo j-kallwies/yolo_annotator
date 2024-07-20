@@ -1,8 +1,8 @@
 #include <QCryptographicHash>
 #include <QDirIterator>
 #include <QElapsedTimer>
-#include <QImage>
-#include <QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 #include "image_list_model.h"
 #include "label_colors.h"

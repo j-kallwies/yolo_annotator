@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QBrush>
-#include <QFont>
-#include <QGraphicsRectItem>
+#include <QtGui/QBrush>
+#include <QtGui/QFont>
+#include <QtWidgets/QGraphicsRectItem>
 
 enum class BoundingBoxPart
 {
@@ -15,6 +15,7 @@ enum class BoundingBoxPart
   EdgeRight,
   EdgeTop,
   EdgeBottom,
+  Foo,
 };
 
 class AnnotationBoundingBox : public QGraphicsRectItem

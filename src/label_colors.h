@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QColor>
+#include <QtGui/QColor>
 
 struct LabelColors
 {

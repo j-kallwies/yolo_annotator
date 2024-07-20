@@ -1,5 +1,5 @@
-#include <QFileIconProvider>
-#include <QGraphicsPixmapItem>
+#include <QtWidgets/QFileIconProvider>
+#include <QtWidgets/QGraphicsPixmapItem>
 #include <QProcess>
 #include <QRandomGenerator>
 

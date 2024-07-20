@@ -1,8 +1,8 @@
 #include "annotationboundingbox.h"
 #include "label_colors.h"
 
-#include <QPainter>
-#include <QPen>
+#include <QtGui/QPainter>
+#include <QtGui/QPen>
 
 AnnotationBoundingBox::AnnotationBoundingBox(const QRectF& rect,
                                              const int label_id,
